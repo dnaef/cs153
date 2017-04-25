@@ -54,7 +54,7 @@ forktest(void)
   int n, pid;
 
   printf(1, "fork test\n");
-  39:	c7 44 24 04 10 04 00 	movl   $0x410,0x4(%esp)
+  39:	c7 44 24 04 20 04 00 	movl   $0x420,0x4(%esp)
   40:	00 
   41:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   48:	e8 b3 ff ff ff       	call   0 <printf>
@@ -119,7 +119,7 @@ forktest(void)
   }
 
   printf(1, "fork test OK\n");
-  96:	c7 44 24 04 42 04 00 	movl   $0x442,0x4(%esp)
+  96:	c7 44 24 04 52 04 00 	movl   $0x452,0x4(%esp)
   9d:	00 
   9e:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   a5:	e8 56 ff ff ff       	call   0 <printf>
@@ -136,7 +136,7 @@ forktest(void)
     printf(1, "fork claimed to work N times!\n", N);
   b0:	c7 44 24 08 e8 03 00 	movl   $0x3e8,0x8(%esp)
   b7:	00 
-  b8:	c7 44 24 04 50 04 00 	movl   $0x450,0x4(%esp)
+  b8:	c7 44 24 04 60 04 00 	movl   $0x460,0x4(%esp)
   bf:	00 
   c0:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   c7:	e8 34 ff ff ff       	call   0 <printf>
@@ -148,7 +148,7 @@ forktest(void)
   for(; n > 0; n--){
     if(wait(0) < 0){
       printf(1, "wait stopped early\n");
-  d8:	c7 44 24 04 1b 04 00 	movl   $0x41b,0x4(%esp)
+  d8:	c7 44 24 04 2b 04 00 	movl   $0x42b,0x4(%esp)
   df:	00 
   e0:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
   e7:	e8 14 ff ff ff       	call   0 <printf>
@@ -160,7 +160,7 @@ forktest(void)
 
   if(wait(0) != -1){
     printf(1, "wait got too many\n");
-  f8:	c7 44 24 04 2f 04 00 	movl   $0x42f,0x4(%esp)
+  f8:	c7 44 24 04 3f 04 00 	movl   $0x43f,0x4(%esp)
   ff:	00 
  100:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
  107:	e8 f4 fe ff ff       	call   0 <printf>
@@ -821,7 +821,19 @@ SYSCALL(uptime)
  407:	c3                   	ret    
 
 00000408 <hello>:
-SYSCALL(hello)
+SYSCALL(hello) 			// added for Lab0
  408:	b8 16 00 00 00       	mov    $0x16,%eax
  40d:	cd 40                	int    $0x40
  40f:	c3                   	ret    
+
+00000410 <waitpid>:
+SYSCALL(waitpid) 		// lab1 part 1: c
+ 410:	b8 17 00 00 00       	mov    $0x17,%eax
+ 415:	cd 40                	int    $0x40
+ 417:	c3                   	ret    
+
+00000418 <setpriority>:
+SYSCALL(setpriority) 	// lab1 part 2: define syscall
+ 418:	b8 18 00 00 00       	mov    $0x18,%eax
+ 41d:	cd 40                	int    $0x40
+ 41f:	c3                   	ret    

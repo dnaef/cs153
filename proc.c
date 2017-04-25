@@ -278,7 +278,8 @@ wait(int *status)
   }
 }
 
-int waitpid(int pid, int* status, int options)		//added lab1 part1 
+int 
+waitpid(int pid, int* status, int options)		//added lab1 part1 
 {													//exactly the same as wait 
 													//but now searches for passed in pid
   struct proc *p;									//pid flag substituted for child flag
