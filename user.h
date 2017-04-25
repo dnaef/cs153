@@ -3,8 +3,8 @@ struct rtcdate;
 
 // system calls
 int fork(void);
-int exit(int) __attribute__((noreturn)); // lab1 part 1: a
-int wait(int*);                          // lab1 part 1: b
+int exit(int status) __attribute__((noreturn)); // lab1 part 1: a
+int wait(int *status);                          // lab1 part 1: b
 int pipe(int*);
 int write(int, void*, int);
 int read(int, void*, int);
@@ -24,8 +24,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 void hello(void);
-int waitpid(int pid, int* status, int options); // lab1 part 1: c
-int setpriority(int pud, int priority);			// lab1 part 2: allows for adding a priority value to each process
+int waitpid(int pid, int *status, int options); // lab1 part 1: c
+int setpriority(int pid, int priority);			// lab1 part 2: allows for adding a priority value to each process
 
 // ulib.c
 int stat(char*, struct stat*);
