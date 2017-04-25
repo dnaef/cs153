@@ -29,4 +29,6 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
-SYSCALL(hello)
+SYSCALL(hello) 			// added for Lab0
+SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(setpriority) 	// lab1 part 2: define syscall
