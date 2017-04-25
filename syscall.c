@@ -98,7 +98,9 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_hello(void);
+extern int sys_hello(void);			//practice lab
+extern int sys_waitpid(void);		//lab1 part 1c
+extern int sys_setpriority(void);	//lab1 part 2
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -122,7 +124,9 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_hello]    sys_hello,
+[SYS_hello]   sys_hello,			//practice lab
+[SYS_waitpid] sys_waitpid,			//lab 1 part1b
+[SYS_setpriority] sys_setpriority,	//lab 1 part2
 };
 
 void
