@@ -14,20 +14,60 @@ sys_fork(void)
 }
 
 int
-sys_exit(void)
+sys_exit(void) // modified exit to handle a exit status (lab1 part1: a)
 {
   int exitstat;
   argint(0, &exitstat);
-  exit(exitstat);
+  if (exitstat < 0) {
+	  return -1;  
+  }
+  else{
+	 exit(exitstat);   
+  }
   return 0;  // not reached
 }
 
 int
-sys_wait(void)
+sys_wait(void) // update sys_wait to wiat for a process with a pod that equals the one provided by the waitStatus argument (lab1 part1b)
 {
   int waitStatus;
-  argint(0, &waitStatus);
+  int checkStatus;
+  checkStatus = (argptr(0, (char**)&waitStatus,sizeof(int*))  );
+  if (checkStatus > 0) {
+	  return -1;
+  }
   return wait(&waitStatus);
+}
+
+int
+sys_waitpid(void) //  Added waitpid sstem call which waits for a process with a pid that is equal to the pid provided by the argumet handles errors
+{
+	int pid;
+	int* waitStatus;
+	int arg;
+	
+	if(argint(0, &pid) < 0) {
+		return -1;
+	}
+	if(argptr(0, (char**)&waitStatus, sizeof(int*)) < 0){
+		return -1;
+	}
+	if(argint(1, &arg) < 0) {
+		return -1;
+	}
+
+	return(waitpid(pid,waitStatus,arg));
+}
+
+int 
+sys_setpriority(void) {
+	int pid;
+	int priority;
+	if(argint(1, &priority) < 0 || argint(0, &pid) < 0 || priority < 0 || priority > 63 || pid < 0){
+		return -1;
+	return (setpriority(pid, priority));
+}
+	
 }
 
 int
@@ -99,5 +139,7 @@ sys_hello(void)
   hello();
   return 0;
 }
+
+
 
 
