@@ -15405,7 +15405,7 @@ sys_waitpid(void) //  Added waitpid sstem call which waits for a process with a 
 80105879:	85 c0                	test   %eax,%eax
 8010587b:	79 0b                	jns    80105888 <sys_waitpid+0x28>
 	}
-	if(argint(1, &arg) < 0) {
+	if(argint(2, &arg) < 0) {
 		return -1;
 	}
 
@@ -15420,21 +15420,21 @@ sys_waitpid(void) //  Added waitpid sstem call which waits for a process with a 
 	if(argint(0, &pid) < 0) {
 		return -1;
 	}
-	if(argptr(0, (char**)&waitStatus, sizeof(int*)) < 0){
+	if(argptr(1, (char**)&waitStatus, sizeof(int*)) < 0){
 80105888:	8d 45 f0             	lea    -0x10(%ebp),%eax
 8010588b:	c7 44 24 08 04 00 00 	movl   $0x4,0x8(%esp)
 80105892:	00 
 80105893:	89 44 24 04          	mov    %eax,0x4(%esp)
-80105897:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+80105897:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
 8010589e:	e8 0d f1 ff ff       	call   801049b0 <argptr>
 801058a3:	85 c0                	test   %eax,%eax
 801058a5:	78 d6                	js     8010587d <sys_waitpid+0x1d>
 		return -1;
 	}
-	if(argint(1, &arg) < 0) {
+	if(argint(2, &arg) < 0) {
 801058a7:	8d 45 ec             	lea    -0x14(%ebp),%eax
 801058aa:	89 44 24 04          	mov    %eax,0x4(%esp)
-801058ae:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+801058ae:	c7 04 24 02 00 00 00 	movl   $0x2,(%esp)
 801058b5:	e8 b6 f0 ff ff       	call   80104970 <argint>
 801058ba:	85 c0                	test   %eax,%eax
 801058bc:	78 bf                	js     8010587d <sys_waitpid+0x1d>

@@ -49,10 +49,10 @@ sys_waitpid(void) //  Added waitpid sstem call which waits for a process with a 
 	if(argint(0, &pid) < 0) {
 		return -1;
 	}
-	if(argptr(0, (char**)&waitStatus, sizeof(int*)) < 0){
+	if(argptr(1, (char**)&waitStatus, sizeof(int*)) < 0){
 		return -1;
 	}
-	if(argint(1, &arg) < 0) {
+	if(argint(2, &arg) < 0) {
 		return -1;
 	}
 
