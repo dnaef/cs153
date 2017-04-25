@@ -166,17 +166,17 @@ UPROGS=\
 	_grep\
 	_init\
 	_kill\
+	_lab1\
 	_ln\
 	_ls\
 	_mkdir\
 	_rm\
 	_sh\
 	_stressfs\
+	_test\
 	#_usertests\
 	_wc\
 	_zombie\
-	_test\
-	_lab1\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

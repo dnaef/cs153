@@ -5,7 +5,7 @@ int
 main(int argc, char *argv[])
 {
 	hello();
-	exit(0);
+	exit();
 	//pid = fork();
 	//if (pid >0) {
 		//int status;
