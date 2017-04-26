@@ -16,13 +16,13 @@ sys_fork(void)
 int
 sys_exit(void) // modified exit to handle a exit status (lab1 part1: a)
 {
-  int exitstat;
-  argint(0, &exitstat);
-  if (exitstat < 0) {
+  int status;
+  
+  if (argint(0, &status) > 0) {
 	  return -1;  
   }
   else{
-	 exit(exitstat);   
+	 exit(status);   
   }
   return 0;  // not reached
 }
@@ -30,29 +30,28 @@ sys_exit(void) // modified exit to handle a exit status (lab1 part1: a)
 int
 sys_wait(void) // update sys_wait to wiat for a process with a pod that equals the one provided by the waitStatus argument (lab1 part1b)
 {
-  int waitStatus;
-  int checkStatus;
-  checkStatus = (argptr(0, (char**)&waitStatus,sizeof(int*))  );
-  if (checkStatus > 0) {
+  int *waitStatus;
+
+  if (argptr(0, (char**)&waitStatus, sizeof(int)) > 0) {
 	  return -1;
   }
-  return wait(&waitStatus);
+  return wait(waitStatus);
 }
 
 int
 sys_waitpid(void) //  Added waitpid sstem call which waits for a process with a pid that is equal to the pid provided by the argumet handles errors
 {
 	int pid;
-	int* waitStatus;
+	int *waitStatus;
 	int arg;
 	
 	if(argint(0, &pid) < 0) {
 		return -1;
 	}
-	if(argptr(1, (char**)&waitStatus, sizeof(int*)) < 0){
+	if(argptr(1, (char**)&waitStatus, sizeof(int)) > 0){
 		return -1;
 	}
-	if(argint(2, &arg) < 0) {
+	if(argint(2, &arg) > 100) {
 		return -1;
 	}
 

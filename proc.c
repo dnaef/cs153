@@ -203,7 +203,7 @@ exit(int status) // lab 1 part1a change to int status
   }
 
   // save exit status
-  proc->exitstat = status; //lab1 part1a return exit status to created variable
+  proc->status = status; //lab1 part1a return exit status to created variable
   
   begin_op();
   iput(proc->cwd);
@@ -259,7 +259,7 @@ wait(int *status)
         p->state = UNUSED;
         
         if(status != 0) {			//lab1 part 1b set status if status is not null
-			*status = p->exitstat;
+			*status = p->status;
 		}
 		
         release(&ptable.lock);
@@ -306,7 +306,7 @@ waitpid(int pid, int* status, int options)		//added lab1 part1
         p->state = UNUSED;
 
 		if(status != 0){			//same as wait function addition
-			*status = p->exitstat;
+			*status = p->status;
 		}
       release(&ptable.lock);
         
