@@ -50,7 +50,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
 
-  p->priority = 63; 	//lab1 part2 sceduling - set default priority to lowest priority
+  p->priority = 20; 	//lab1 part2 sceduling - set default priority to lowest priority
 
   release(&ptable.lock);
 
@@ -325,18 +325,18 @@ waitpid(int pid, int* status, int options)		//added lab1 part1
   }
 }
 
-int setpriority(int pid, int priority)			//added lab1p2
+int setpriority(int priority)			//added lab1p2
 {												//sets given priorty for given process
-    struct proc* p;
+    //struct proc* p;
   
-    acquire(&ptable.lock);
+    //acquire(&ptable.lock);
 
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->pid == pid)
-        p->priority = priority; 
-    }
+    //for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      //if(p->pid == pid)
+     proc->priority = priority; 
+    //}
 
-    release(&ptable.lock);
+    //release(&ptable.lock);
 
     return 0;
 }
@@ -356,9 +356,10 @@ scheduler(void) 							//Lab 1 part 2 editing scheduler
 
   for(;;){
 	  
-	highest_Priority = 64;
+	//highest_Priority = 64;
     // Enable interrupts on this processor.
     sti();
+	highest_Priority = 64;
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
@@ -368,18 +369,23 @@ scheduler(void) 							//Lab 1 part 2 editing scheduler
       if(p->priority < highest_Priority)	//when you run out of runnable processes
       {										
 		  highest_Priority = p->priority;	//save the highest priority (lowest number_ into the struct)
-		  proc = p;							//run the proccess.
+		  //proc = p;							//run the proccess.
 	  }
-
+	}
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
+      if(p->state != RUNNABLE || p->priority != highest_Priority)
+		continue;
+	
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
       
       //edited for lab 1 part 2 round robin scheduler
-      if(proc != 0) //created if statement that makes sure proc is not 0
-      {
-		//proc = p;
-		switchuvm(proc);
+      //if(proc != 0) //created if statement that makes sure proc is not 0
+      //{
+		proc = p;
+		switchuvm(p);
 		p->state = RUNNING;
 		swtch(&cpu->scheduler, p->context);
 		switchkvm();
@@ -389,7 +395,6 @@ scheduler(void) 							//Lab 1 part 2 editing scheduler
 		proc = 0;
 	  }
       
-    }
     release(&ptable.lock);
 
   }

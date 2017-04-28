@@ -13,11 +13,11 @@
 00000000 .debug_pubtypes
 00000000 .debug_ranges
 00000000 ls.c
-00000aa8 buf.931
+00000aa8 buf.930
 00000000 ulib.c
 00000000 printf.c
 00000650 printint
-00000a97 digits.920
+00000a97 digits.919
 00000000 umalloc.c
 00000ac0 freep
 00000ab8 base
