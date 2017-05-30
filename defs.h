@@ -116,6 +116,7 @@ void            userinit(void);
 int             wait(int *status);							//added lab1 part1b
 int				waitpid(int pid, int *status, int options); 	//added lab1 part1c
 int				setpriority(int priority); //added lab1 part2
+int 			v2p(int* virtual, int* physical); //added lab2 part1&2
 void            wakeup(void*);
 void            yield(void);
 void 			hello(void);
