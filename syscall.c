@@ -101,6 +101,7 @@ extern int sys_uptime(void);
 extern int sys_hello(void);			//practice lab
 extern int sys_waitpid(void);		//lab1 part 1c
 extern int sys_setpriority(void);	//lab1 part 2
+extern int sys_v2p(void);			//lab2 part 1
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -127,6 +128,7 @@ static int (*syscalls[])(void) = {
 [SYS_hello]   sys_hello,			//practice lab
 [SYS_waitpid] sys_waitpid,			//lab 1 part1b
 [SYS_setpriority] sys_setpriority,	//lab 1 part2
+[SYS_v2p]	  sys_v2p,				//lab2
 };
 
 void
