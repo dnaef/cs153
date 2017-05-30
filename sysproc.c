@@ -139,6 +139,17 @@ sys_hello(void)
   return 0;
 }
 
+int
+sys_v2p(void)		//lab2 part 1
+{
+	int* virtual;
+	int* physical;
+	if(argptr(0, (char**)&virtual, sizeof(int*)) < 0)
+		return -1;
+	if(argptr(1, (char**)&physical, sizeof(int*)) < 0)
+		return -1;
+	return v2p(virtual, physical);
+}
 
 
 
