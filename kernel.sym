@@ -1,7 +1,7 @@
 80100000 .text
-80107280 .rodata
-80107c40 .stab
-80107c41 .stabstr
+801072a0 .rodata
+80107c60 .stab
+80107c61 .stabstr
 80108000 .data
 8010a520 .bss
 00000000 .debug_line
@@ -21,7 +21,7 @@
 8010a520 panicked
 80100450 consputc
 801007f0 printint
-801072f8 digits.1428
+80107318 digits.1428
 00000000 exec.c
 00000000 file.c
 00000000 fs.c
@@ -39,9 +39,9 @@
 00000000 kalloc.c
 00000000 kbd.c
 8010a5bc shift.1265
-801074e0 shiftcode
-801075e0 togglecode
-801076e0 charcode.1266
+80107500 shiftcode
+80107600 togglecode
+80107700 charcode.1266
 80108000 normalmap
 80108100 shiftmap
 80108200 ctlmap
@@ -59,7 +59,7 @@
 8010a000 irqmask
 00000000 pipe.c
 00000000 proc.c
-801078a0 states.1704
+801078c0 states.1704
 8010a008 first.1652
 8010a5c4 initproc
 80103fa0 allocproc
@@ -67,7 +67,7 @@
 00000000 spinlock.c
 00000000 string.c
 00000000 syscall.c
-80107920 syscalls
+80107940 syscalls
 00000000 sysfile.c
 80104d90 create
 80105470 argfd.clone.0
@@ -221,7 +221,7 @@
 801062bb vector113
 80102460 freerange
 80106327 vector125
-80106e90 allocuvm
+80106ea0 allocuvm
 80105a40 trapret
 80106762 vector216
 801060f9 vector63
@@ -457,7 +457,7 @@
 801068d6 vector247
 80105f88 vector22
 801066ba vector202
-80107150 seginit
+80107160 seginit
 80101c50 iunlockput
 8010614a vector72
 801060b1 vector55
@@ -477,7 +477,7 @@
 80106426 vector147
 80104420 initsleeplock
 801021d0 ideinit
-80106fb0 loaduvm
+80106fc0 loaduvm
 8010626a vector104
 801062d6 vector116
 80112da0 ptable
@@ -521,7 +521,7 @@
 80106261 vector103
 80104f40 sys_mknod
 80102790 lapicstartap
-80107070 switchuvm
+80107080 switchuvm
 80104500 pushcli
 801024b0 kinit2
 80105f2f vector11
