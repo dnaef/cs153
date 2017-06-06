@@ -142,7 +142,7 @@ sys_hello(void)
 int
 sys_v2p(void)		//lab2 part 1
 {
-	int* virtual;
+	int virtual;
 	int* physical;
 	if(argptr(0, (char**)&virtual, sizeof(int*)) < 0)
 		return -1;

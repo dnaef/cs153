@@ -26,7 +26,7 @@ int uptime(void);
 void hello(void);
 int waitpid(int pid, int *status, int options); // lab1 part 1: c
 int setpriority(int priority);			// lab1 part 2: allows for adding a priority value to each process
-int v2p(int* virtual, int* physical);   // lab2 part 1: takes a virtual address and returns the physical address
+int v2p(int virtual, int* physical);   // lab2 part 1: takes a virtual address and returns the physical address
 
 // ulib.c
 int stat(char*, struct stat*);

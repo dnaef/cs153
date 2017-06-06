@@ -341,23 +341,20 @@ int setpriority(int priority)			//added lab1p2
     return 0;
 }
 
-int v2p(int* virtual, int* physical)			//lab2 part1
+int v2p(int virt, int* physical)			//lab2 part1
 {
-	pde_t* pde;
-	pte_t* pgtab;
-	pte_t* pgdir;
-	int offset12;
+  pde_t *pde;
+  pte_t *pgtab = 0;
+
+ pde = &proc->pgdir[PDX(virt)];
+  if(*pde & PTE_P)
+  {
+    pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
+  }
+
+ *physical = (int)&pgtab[PTX(virt)];
+  return (int)&pgtab[PTX(virt)];
 	
-	pgdir = proc->pgdir;
-	pde = &pgdir[PDX(virtual)];
-	if(*pde & PTE_P){
-		pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
-		offset12 = (uint)virtual & 0xFFF;
-		*physical = (uint)(&pgtab[PTX(virtual)]) << 12 | offset12;
-	}
-	else
-		return -1;
-	return 0;
 }
 
 //PAGEBREAK: 42

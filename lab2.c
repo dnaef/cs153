@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
   
   printf(1,"\n Testing Part 1: Memory translation system cal: \n system call v2p(int virtual, int *physical) \n\n");
   
-  if(v2p(&virtual, &physical))
+  if(v2p(virtual, &physical))
 	printf(1,"\n Virtual address 0x%x is mapped to physical address 0x%x \n",virtual, physical);
   else
 	printf(2,"\n v2p system call faild! \n");

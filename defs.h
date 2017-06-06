@@ -116,7 +116,7 @@ void            userinit(void);
 int             wait(int *status);							//added lab1 part1b
 int				waitpid(int pid, int *status, int options); 	//added lab1 part1c
 int				setpriority(int priority); //added lab1 part2
-int 			v2p(int* virtual, int* physical); //added lab2 part1&2
+int 			v2p(int virtual, int* physical); //added lab2 part1&2
 void            wakeup(void*);
 void            yield(void);
 void 			hello(void);
@@ -182,7 +182,7 @@ int             deallocuvm(pde_t*, uint, uint);
 void            freevm(pde_t*);
 void            inituvm(pde_t*, char*, uint);
 int             loaduvm(pde_t*, char*, struct inode*, uint, uint);
-pde_t*          copyuvm(pde_t*, uint, uint);
+pde_t*          copyuvm(pde_t*, uint, uint); // lab2 part 3
 void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
