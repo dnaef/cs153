@@ -14,7 +14,7 @@
 00000000 .debug_pubtypes
 00000000 .debug_ranges
 00000000 sh.c
-000024a0 buf.1001
+000024a0 buf.1002
 00000000 ulib.c
 00000000 printf.c
 00001f90 printint

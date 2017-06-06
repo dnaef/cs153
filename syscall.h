@@ -20,7 +20,7 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
-#define SYS_hello   22		//practice lab
-#define SYS_waitpid 23		//lab 1 part1b
-#define SYS_setpriority 24	//lab 1 part2
-#define SYS_v2p 	25		//lab2 part1
+#define SYS_hello  22
+#define SYS_waitpid 23
+#define SYS_setpriority 24
+#define SYS_v2p     25

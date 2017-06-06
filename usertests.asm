@@ -78,11 +78,11 @@ bsstest(void)
     1046:	e8 b5 40 00 00       	call   5100 <printf>
   for(i = 0; i < sizeof(uninit); i++){
     if(uninit[i] != '\0'){
-    104b:	80 3d e0 6c 00 00 00 	cmpb   $0x0,0x6ce0
+    104b:	80 3d 00 6d 00 00 00 	cmpb   $0x0,0x6d00
     1052:	75 36                	jne    108a <bsstest+0x5a>
     1054:	b8 01 00 00 00       	mov    $0x1,%eax
     1059:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-    1060:	80 b8 e0 6c 00 00 00 	cmpb   $0x0,0x6ce0(%eax)
+    1060:	80 b8 00 6d 00 00 00 	cmpb   $0x0,0x6d00(%eax)
     1067:	75 21                	jne    108a <bsstest+0x5a>
 bsstest(void)
 {
@@ -209,7 +209,7 @@ opentest(void)
     1149:	8d bc 27 00 00 00 00 	lea    0x0(%edi,%eiz,1),%edi
 
 00001150 <argptest>:
-  wait(0);
+  wait(&exit_status);
   printf(1, "uio test done\n");
 }
 
@@ -312,8 +312,8 @@ uio()
     printf (1, "fork failed\n");
     exit(0);
   }
-  wait(0);
-    1206:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    1206:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     120d:	e8 9e 3d 00 00       	call   4fb0 <wait>
   printf(1, "uio test done\n");
     1212:	c7 44 24 04 19 55 00 	movl   $0x5519,0x4(%esp)
@@ -417,8 +417,8 @@ forktest(void)
     12b9:	74 1a                	je     12d5 <forktest+0x55>
     12bb:	90                   	nop
     12bc:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-    if(wait(0) < 0){
-    12c0:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    if(wait(&exit_status) < 0){
+    12c0:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     12c7:	e8 e4 3c 00 00       	call   4fb0 <wait>
     12cc:	85 c0                	test   %eax,%eax
     12ce:	78 50                	js     1320 <forktest+0xa0>
@@ -435,8 +435,8 @@ forktest(void)
     }
   }
 
-  if(wait(0) != -1){
-    12d5:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  if(wait(&exit_status) != -1){
+    12d5:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     12dc:	e8 cf 3c 00 00       	call   4fb0 <wait>
     12e1:	83 f8 ff             	cmp    $0xffffffff,%eax
     12e4:	75 5a                	jne    1340 <forktest+0xc0>
@@ -470,7 +470,7 @@ forktest(void)
   }
 
   for(; n > 0; n--){
-    if(wait(0) < 0){
+    if(wait(&exit_status) < 0){
       printf(1, "wait stopped early\n");
     1320:	c7 44 24 04 33 55 00 	movl   $0x5533,0x4(%esp)
     1327:	00 
@@ -482,7 +482,7 @@ forktest(void)
     }
   }
 
-  if(wait(0) != -1){
+  if(wait(&exit_status) != -1){
     printf(1, "wait got too many\n");
     1340:	c7 44 24 04 47 55 00 	movl   $0x5547,0x4(%esp)
     1347:	00 
@@ -514,8 +514,8 @@ exitwait(void)
     }
     if(pid){
     1370:	0f 84 7d 00 00 00    	je     13f3 <exitwait+0x93>
-      if(wait(0) != pid){
-    1376:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+      if(wait(&exit_status) != pid){
+    1376:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     137d:	e8 2e 3c 00 00       	call   4fb0 <wait>
     1382:	39 c3                	cmp    %eax,%ebx
     1384:	75 32                	jne    13b8 <exitwait+0x58>
@@ -562,7 +562,7 @@ exitwait(void)
       return;
     }
     if(pid){
-      if(wait(0) != pid){
+      if(wait(&exit_status) != pid){
         printf(1, "wait wrong pid\n");
     13b8:	c7 44 24 04 68 55 00 	movl   $0x5568,0x4(%esp)
     13bf:	00 
@@ -597,7 +597,7 @@ exitwait(void)
     13f0:	5e                   	pop    %esi
     13f1:	5d                   	pop    %ebp
     13f2:	c3                   	ret    
-      if(wait(0) != pid){
+      if(wait(&exit_status) != pid){
         printf(1, "wait wrong pid\n");
         return;
       }
@@ -813,7 +813,7 @@ fsfull()
       int cc = write(fd, buf, 512);
     14e2:	c7 44 24 08 00 02 00 	movl   $0x200,0x8(%esp)
     14e9:	00 
-    14ea:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    14ea:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     14f1:	00 
     14f2:	89 3c 24             	mov    %edi,(%esp)
     14f5:	e8 ce 3a 00 00       	call   4fc8 <write>
@@ -1086,7 +1086,7 @@ bigwrite(void)
     for(i = 0; i < 2; i++){
       int cc = write(fd, buf, sz);
     165e:	89 5c 24 08          	mov    %ebx,0x8(%esp)
-    1662:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    1662:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     1669:	00 
     166a:	89 04 24             	mov    %eax,(%esp)
     166d:	e8 56 39 00 00       	call   4fc8 <write>
@@ -1100,7 +1100,7 @@ bigwrite(void)
     for(i = 0; i < 2; i++){
       int cc = write(fd, buf, sz);
     1676:	89 5c 24 08          	mov    %ebx,0x8(%esp)
-    167a:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    167a:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     1681:	00 
     1682:	89 34 24             	mov    %esi,(%esp)
     1685:	e8 3e 39 00 00       	call   4fc8 <write>
@@ -1284,7 +1284,7 @@ unlinkread(void)
   if(read(fd, buf, sizeof(buf)) != 5){
     17e2:	c7 44 24 08 00 20 00 	movl   $0x2000,0x8(%esp)
     17e9:	00 
-    17ea:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    17ea:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     17f1:	00 
     17f2:	89 1c 24             	mov    %ebx,(%esp)
     17f5:	e8 c6 37 00 00       	call   4fc0 <read>
@@ -1294,7 +1294,7 @@ unlinkread(void)
     exit(0);
   }
   if(buf[0] != 'h'){
-    1803:	80 3d 00 94 00 00 68 	cmpb   $0x68,0x9400
+    1803:	80 3d 20 94 00 00 68 	cmpb   $0x68,0x9420
     180a:	0f 85 8c 00 00 00    	jne    189c <unlinkread+0x17c>
     printf(1, "unlinkread wrong data\n");
     exit(0);
@@ -1302,7 +1302,7 @@ unlinkread(void)
   if(write(fd, buf, 10) != 10){
     1810:	c7 44 24 08 0a 00 00 	movl   $0xa,0x8(%esp)
     1817:	00 
-    1818:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    1818:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     181f:	00 
     1820:	89 1c 24             	mov    %ebx,(%esp)
     1823:	e8 a0 37 00 00       	call   4fc8 <write>
@@ -1468,7 +1468,7 @@ createdelete(void)
     195e:	8d 75 c8             	lea    -0x38(%ebp),%esi
 
   for(pi = 0; pi < 4; pi++){
-    wait(0);
+    wait(&exit_status);
   }
 
   name[0] = name[1] = name[2] = 0;
@@ -1478,14 +1478,14 @@ createdelete(void)
   }
 
   for(pi = 0; pi < 4; pi++){
-    wait(0);
-    1963:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    1963:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     196a:	e8 41 36 00 00       	call   4fb0 <wait>
-    196f:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    196f:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     1976:	e8 35 36 00 00       	call   4fb0 <wait>
-    197b:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    197b:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     1982:	e8 29 36 00 00       	call   4fb0 <wait>
-    1987:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    1987:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     198e:	e8 1d 36 00 00       	call   4fb0 <wait>
   }
 
@@ -1494,14 +1494,14 @@ createdelete(void)
     1997:	89 75 c0             	mov    %esi,-0x40(%ebp)
     199a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   for(i = 0; i < N; i++){
-    19a0:	8d 47 30             	lea    0x30(%edi),%eax
-    19a3:	85 ff                	test   %edi,%edi
-    19a5:	88 45 c4             	mov    %al,-0x3c(%ebp)
-    19a8:	0f 94 c0             	sete   %al
-    19ab:	83 ff 09             	cmp    $0x9,%edi
-    19ae:	0f 9f c2             	setg   %dl
-    19b1:	bb 70 00 00 00       	mov    $0x70,%ebx
-    19b6:	89 d6                	mov    %edx,%esi
+    19a0:	85 ff                	test   %edi,%edi
+    19a2:	bb 70 00 00 00       	mov    $0x70,%ebx
+    19a7:	8d 47 30             	lea    0x30(%edi),%eax
+    19aa:	0f 94 c2             	sete   %dl
+    19ad:	83 ff 09             	cmp    $0x9,%edi
+    19b0:	89 d6                	mov    %edx,%esi
+    19b2:	88 45 c4             	mov    %al,-0x3c(%ebp)
+    19b5:	0f 9f c0             	setg   %al
     19b8:	09 c6                	or     %eax,%esi
       name[1] = '0' + i;
       fd = open(name, 0);
@@ -1564,7 +1564,7 @@ createdelete(void)
       if(fd >= 0)
         close(fd);
     19f6:	83 c3 01             	add    $0x1,%ebx
-    wait(0);
+    wait(&exit_status);
   }
 
   name[0] = name[1] = name[2] = 0;
@@ -1573,7 +1573,7 @@ createdelete(void)
     19f9:	80 fb 74             	cmp    $0x74,%bl
     19fc:	75 c2                	jne    19c0 <createdelete+0xa0>
   for(pi = 0; pi < 4; pi++){
-    wait(0);
+    wait(&exit_status);
   }
 
   name[0] = name[1] = name[2] = 0;
@@ -1833,13 +1833,13 @@ createtest(void)
     1bac:	e8 4f 35 00 00       	call   5100 <printf>
 
   name[0] = 'a';
-    1bb1:	c6 05 00 b4 00 00 61 	movb   $0x61,0xb400
+    1bb1:	c6 05 20 b4 00 00 61 	movb   $0x61,0xb420
   name[2] = '\0';
-    1bb8:	c6 05 02 b4 00 00 00 	movb   $0x0,0xb402
+    1bb8:	c6 05 22 b4 00 00 00 	movb   $0x0,0xb422
     1bbf:	90                   	nop
   for(i = 0; i < 52; i++){
     name[1] = '0' + i;
-    1bc0:	88 1d 01 b4 00 00    	mov    %bl,0xb401
+    1bc0:	88 1d 21 b4 00 00    	mov    %bl,0xb421
     fd = open(name, O_CREATE|O_RDWR);
     close(fd);
     1bc6:	83 c3 01             	add    $0x1,%ebx
@@ -1851,7 +1851,7 @@ createtest(void)
     fd = open(name, O_CREATE|O_RDWR);
     1bc9:	c7 44 24 04 02 02 00 	movl   $0x202,0x4(%esp)
     1bd0:	00 
-    1bd1:	c7 04 24 00 b4 00 00 	movl   $0xb400,(%esp)
+    1bd1:	c7 04 24 20 b4 00 00 	movl   $0xb420,(%esp)
     1bd8:	e8 0b 34 00 00       	call   4fe8 <open>
     close(fd);
     1bdd:	89 04 24             	mov    %eax,(%esp)
@@ -1869,17 +1869,17 @@ createtest(void)
     close(fd);
   }
   name[0] = 'a';
-    1bea:	c6 05 00 b4 00 00 61 	movb   $0x61,0xb400
+    1bea:	c6 05 20 b4 00 00 61 	movb   $0x61,0xb420
   name[2] = '\0';
     1bf1:	bb 30 00 00 00       	mov    $0x30,%ebx
-    1bf6:	c6 05 02 b4 00 00 00 	movb   $0x0,0xb402
+    1bf6:	c6 05 22 b4 00 00 00 	movb   $0x0,0xb422
     1bfd:	8d 76 00             	lea    0x0(%esi),%esi
   for(i = 0; i < 52; i++){
     name[1] = '0' + i;
-    1c00:	88 1d 01 b4 00 00    	mov    %bl,0xb401
+    1c00:	88 1d 21 b4 00 00    	mov    %bl,0xb421
     unlink(name);
     1c06:	83 c3 01             	add    $0x1,%ebx
-    1c09:	c7 04 24 00 b4 00 00 	movl   $0xb400,(%esp)
+    1c09:	c7 04 24 20 b4 00 00 	movl   $0xb420,(%esp)
     1c10:	e8 e3 33 00 00       	call   4ff8 <unlink>
     fd = open(name, O_CREATE|O_RDWR);
     close(fd);
@@ -1951,11 +1951,11 @@ writetest1(void)
 
   for(i = 0; i < MAXFILE; i++){
     ((int*)buf)[0] = i;
-    1c80:	89 1d 00 94 00 00    	mov    %ebx,0x9400
+    1c80:	89 1d 20 94 00 00    	mov    %ebx,0x9420
     if(write(fd, buf, 512) != 512){
     1c86:	c7 44 24 08 00 02 00 	movl   $0x200,0x8(%esp)
     1c8d:	00 
-    1c8e:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    1c8e:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     1c95:	00 
     1c96:	89 34 24             	mov    %esi,(%esp)
     1c99:	e8 2a 33 00 00       	call   4fc8 <write>
@@ -2012,7 +2012,7 @@ writetest1(void)
       exit(0);
     }
     if(((int*)buf)[0] != n){
-    1ceb:	a1 00 94 00 00       	mov    0x9400,%eax
+    1ceb:	a1 20 94 00 00       	mov    0x9420,%eax
     1cf0:	39 d8                	cmp    %ebx,%eax
     1cf2:	0f 85 88 00 00 00    	jne    1d80 <writetest1+0x140>
       printf(stdout, "read content of block %d is %d\n",
@@ -2029,7 +2029,7 @@ writetest1(void)
     i = read(fd, buf, 512);
     1cfb:	c7 44 24 08 00 02 00 	movl   $0x200,0x8(%esp)
     1d02:	00 
-    1d03:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    1d03:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     1d0a:	00 
     1d0b:	89 34 24             	mov    %esi,(%esp)
     1d0e:	e8 ad 32 00 00       	call   4fc0 <read>
@@ -2283,7 +2283,7 @@ writetest(void)
   i = read(fd, buf, 2000);
     1ef2:	c7 44 24 08 d0 07 00 	movl   $0x7d0,0x8(%esp)
     1ef9:	00 
-    1efa:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    1efa:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     1f01:	00 
     1f02:	89 1c 24             	mov    %ebx,(%esp)
     1f05:	e8 b6 30 00 00       	call   4fc0 <read>
@@ -2426,8 +2426,8 @@ bigargtest(void)
     printf(stdout, "bigargtest: fork failed\n");
     exit(0);
   }
-  wait(0);
-    1ff6:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    1ff6:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     1ffd:	e8 ae 2f 00 00       	call   4fb0 <wait>
   fd = open("bigarg-ok", 0);
     2002:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
@@ -2508,7 +2508,7 @@ bigargtest(void)
     20b6:	e8 ed 2e 00 00       	call   4fa8 <exit>
     exit(0);
   }
-  wait(0);
+  wait(&exit_status);
   fd = open("bigarg-ok", 0);
   if(fd < 0){
     printf(stdout, "bigarg test failed!\n");
@@ -2632,8 +2632,8 @@ validatetest(void)
     kill(pid);
     2197:	89 34 24             	mov    %esi,(%esp)
     219a:	e8 39 2e 00 00       	call   4fd8 <kill>
-    wait(0);
-    219f:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    219f:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     21a6:	e8 05 2e 00 00       	call   4fb0 <wait>
 
     // try to crash the kernel by passing in a bad string pointer
@@ -2670,7 +2670,7 @@ validatetest(void)
     21e8:	5d                   	pop    %ebp
     21e9:	c3                   	ret    
     kill(pid);
-    wait(0);
+    wait(&exit_status);
 
     // try to crash the kernel by passing in a bad string pointer
     if(link("nosuchfile", (char*)p) != -1){
@@ -2996,8 +2996,8 @@ linkunlink()
     241c:	8b 45 e4             	mov    -0x1c(%ebp),%eax
     241f:	85 c0                	test   %eax,%eax
     2421:	74 66                	je     2489 <linkunlink+0x119>
-    wait(0);
-    2423:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    2423:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     242a:	e8 81 2b 00 00       	call   4fb0 <wait>
   else
     exit(0);
@@ -3043,7 +3043,7 @@ linkunlink()
   }
 
   if(pid)
-    wait(0);
+    wait(&exit_status);
   else
     exit(0);
     2489:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
@@ -3159,7 +3159,7 @@ linktest(void)
   if(read(fd, buf, sizeof(buf)) != 5){
     257c:	c7 44 24 08 00 20 00 	movl   $0x2000,0x8(%esp)
     2583:	00 
-    2584:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    2584:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     258b:	00 
     258c:	89 04 24             	mov    %eax,(%esp)
     258f:	e8 2c 2a 00 00       	call   4fc0 <read>
@@ -3472,8 +3472,8 @@ sbrktest(void)
     27d7:	85 f6                	test   %esi,%esi
     27d9:	0f 84 b1 02 00 00    	je     2a90 <sbrktest+0x350>
     exit(0);
-  wait(0);
-    27df:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    27df:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     27e6:	e8 c5 27 00 00       	call   4fb0 <wait>
 
   // can one grow address space to something big?
@@ -3637,8 +3637,8 @@ sbrktest(void)
       kill(ppid);
       exit(0);
     }
-    wait(0);
-    28fc:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    28fc:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     2903:	e8 a8 26 00 00       	call   4fb0 <wait>
     printf(stdout, "sbrk downsize failed, a %x c %x\n", a, c);
     exit(0);
@@ -3648,7 +3648,7 @@ sbrktest(void)
   for(a = (char*)(KERNBASE); a < (char*) (KERNBASE+2000000); a += 50000){
     2908:	81 fb 80 84 1e 80    	cmp    $0x801e8480,%ebx
     290e:	75 c8                	jne    28d8 <sbrktest+0x198>
-    wait(0);
+    wait(&exit_status);
   }
 
   // if we run the system out of memory, does it clean up the last
@@ -3721,8 +3721,8 @@ sbrktest(void)
     kill(pids[i]);
     2979:	89 04 24             	mov    %eax,(%esp)
     297c:	e8 57 26 00 00       	call   4fd8 <kill>
-    wait(0);
-    2981:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    2981:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     2988:	e8 23 26 00 00       	call   4fb0 <wait>
       read(fds[0], &scratch, 1);
   }
@@ -3736,7 +3736,7 @@ sbrktest(void)
     if(pids[i] == -1)
       continue;
     kill(pids[i]);
-    wait(0);
+    wait(&exit_status);
   }
   if(c == (char*)0xffffffff){
     2995:	83 fe ff             	cmp    $0xffffffff,%esi
@@ -3817,7 +3817,7 @@ sbrktest(void)
     2a56:	e8 4d 25 00 00       	call   4fa8 <exit>
       continue;
     kill(pids[i]);
-    wait(0);
+    wait(&exit_status);
   }
   if(c == (char*)0xffffffff){
     printf(stdout, "failed sbrk leaked memory\n");
@@ -4080,7 +4080,7 @@ preempt(void)
     2c2a:	8b 45 e0             	mov    -0x20(%ebp),%eax
     2c2d:	c7 44 24 08 00 20 00 	movl   $0x2000,0x8(%esp)
     2c34:	00 
-    2c35:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    2c35:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     2c3c:	00 
     2c3d:	89 04 24             	mov    %eax,(%esp)
     2c40:	e8 7b 23 00 00       	call   4fc0 <read>
@@ -4092,9 +4092,9 @@ preempt(void)
     2c52:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
     2c59:	e8 a2 24 00 00       	call   5100 <printf>
   printf(1, "wait... ");
-  wait(0);
-  wait(0);
-  wait(0);
+  wait(&exit_status);
+  wait(&exit_status);
+  wait(&exit_status);
   printf(1, "preempt ok\n");
 }
     2c5e:	83 c4 2c             	add    $0x2c,%esp
@@ -4131,14 +4131,14 @@ preempt(void)
     2ca4:	00 
     2ca5:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
     2cac:	e8 4f 24 00 00       	call   5100 <printf>
-  wait(0);
-    2cb1:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    2cb1:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     2cb8:	e8 f3 22 00 00       	call   4fb0 <wait>
-  wait(0);
-    2cbd:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    2cbd:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     2cc4:	e8 e7 22 00 00       	call   4fb0 <wait>
-  wait(0);
-    2cc9:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    2cc9:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     2cd0:	e8 db 22 00 00       	call   4fb0 <wait>
   printf(1, "preempt ok\n");
     2cd5:	c7 44 24 04 99 5b 00 	movl   $0x5b99,0x4(%esp)
@@ -4198,7 +4198,7 @@ pipe1(void)
     while((n = read(fds[0], buf, cc)) > 0){
     2d34:	8b 45 e0             	mov    -0x20(%ebp),%eax
     2d37:	89 74 24 08          	mov    %esi,0x8(%esp)
-    2d3b:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    2d3b:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     2d42:	00 
     2d43:	89 04 24             	mov    %eax,(%esp)
     2d46:	e8 75 22 00 00       	call   4fc0 <read>
@@ -4208,7 +4208,7 @@ pipe1(void)
     2d55:	8d 76 00             	lea    0x0(%esi),%esi
       for(i = 0; i < n; i++){
         if((buf[i] & 0xff) != (seq++ & 0xff)){
-    2d58:	38 9a 00 94 00 00    	cmp    %bl,0x9400(%edx)
+    2d58:	38 9a 20 94 00 00    	cmp    %bl,0x9420(%edx)
     2d5e:	75 1e                	jne    2d7e <pipe1+0x8e>
   } else if(pid > 0){
     close(fds[1]);
@@ -4283,8 +4283,8 @@ pipe1(void)
     2da9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
       for(i = 0; i < 1033; i++)
         buf[i] = seq++;
-    2db0:	8d 14 03             	lea    (%ebx,%eax,1),%edx
-    2db3:	88 90 00 94 00 00    	mov    %dl,0x9400(%eax)
+    2db0:	8d 14 18             	lea    (%eax,%ebx,1),%edx
+    2db3:	88 90 20 94 00 00    	mov    %dl,0x9420(%eax)
   pid = fork();
   seq = 0;
   if(pid == 0){
@@ -4308,7 +4308,7 @@ pipe1(void)
       if(write(fds[1], buf, 1033) != 1033){
     2dcc:	c7 44 24 08 09 04 00 	movl   $0x409,0x8(%esp)
     2dd3:	00 
-    2dd4:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    2dd4:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     2ddb:	00 
     2ddc:	89 04 24             	mov    %eax,(%esp)
     2ddf:	e8 e4 21 00 00       	call   4fc8 <write>
@@ -4345,8 +4345,8 @@ pipe1(void)
     2e0b:	8b 45 e0             	mov    -0x20(%ebp),%eax
     2e0e:	89 04 24             	mov    %eax,(%esp)
     2e11:	e8 ba 21 00 00       	call   4fd0 <close>
-    wait(0);
-    2e16:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    2e16:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     2e1d:	e8 8e 21 00 00       	call   4fb0 <wait>
   } else {
     printf(1, "fork() failed\n");
@@ -4386,7 +4386,7 @@ pipe1(void)
       exit(0);
     }
     close(fds[0]);
-    wait(0);
+    wait(&exit_status);
   } else {
     printf(1, "fork() failed\n");
     2e75:	c7 44 24 04 e2 5b 00 	movl   $0x5be2,0x4(%esp)
@@ -4650,8 +4650,8 @@ openiputtest(void)
     printf(stdout, "unlink failed\n");
     exit(0);
   }
-  wait(0);
-    30dc:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    30dc:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     30e3:	e8 c8 1e 00 00       	call   4fb0 <wait>
   printf(stdout, "openiput test ok\n");
     30e8:	a1 2c 6c 00 00       	mov    0x6c2c,%eax
@@ -5442,14 +5442,14 @@ subdir(void)
   cc = read(fd, buf, sizeof(buf));
     37bd:	c7 44 24 08 00 20 00 	movl   $0x2000,0x8(%esp)
     37c4:	00 
-    37c5:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    37c5:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     37cc:	00 
     37cd:	89 04 24             	mov    %eax,(%esp)
     37d0:	e8 eb 17 00 00       	call   4fc0 <read>
   if(cc != 2 || buf[0] != 'f'){
     37d5:	83 f8 02             	cmp    $0x2,%eax
     37d8:	0f 85 fe 02 00 00    	jne    3adc <subdir+0x41c>
-    37de:	80 3d 00 94 00 00 66 	cmpb   $0x66,0x9400
+    37de:	80 3d 20 94 00 00 66 	cmpb   $0x66,0x9420
     37e5:	0f 85 f1 02 00 00    	jne    3adc <subdir+0x41c>
     printf(1, "dd/dd/../ff wrong content\n");
     exit(0);
@@ -5543,7 +5543,7 @@ subdir(void)
   if(read(fd, buf, sizeof(buf)) != 2){
     38ad:	c7 44 24 08 00 20 00 	movl   $0x2000,0x8(%esp)
     38b4:	00 
-    38b5:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    38b5:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     38bc:	00 
     38bd:	89 04 24             	mov    %eax,(%esp)
     38c0:	e8 fb 16 00 00       	call   4fc0 <read>
@@ -6393,8 +6393,8 @@ exitiputtest(void)
     }
     exit(0);
   }
-  wait(0);
-    4070:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  wait(&exit_status);
+    4070:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     4077:	e8 34 0f 00 00       	call   4fb0 <wait>
   printf(stdout, "exitiput test ok\n");
     407c:	a1 2c 6c 00 00       	mov    0x6c2c,%eax
@@ -6452,7 +6452,7 @@ exitiputtest(void)
     40d9:	8d bc 27 00 00 00 00 	lea    0x0(%edi,%eiz,1),%edi
 
 000040e0 <iputtest>:
-int stdout = 1;
+int exit_status;
 
 // does chdir() call iput(p->cwd) in a transaction?
 void
@@ -6619,12 +6619,12 @@ bigfile(void)
     41f0:	c7 44 24 08 58 02 00 	movl   $0x258,0x8(%esp)
     41f7:	00 
     41f8:	89 5c 24 04          	mov    %ebx,0x4(%esp)
-    41fc:	c7 04 24 00 94 00 00 	movl   $0x9400,(%esp)
+    41fc:	c7 04 24 20 94 00 00 	movl   $0x9420,(%esp)
     4203:	e8 18 0c 00 00       	call   4e20 <memset>
     if(write(fd, buf, 600) != 600){
     4208:	c7 44 24 08 58 02 00 	movl   $0x258,0x8(%esp)
     420f:	00 
-    4210:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    4210:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     4217:	00 
     4218:	89 34 24             	mov    %esi,(%esp)
     421b:	e8 a8 0d 00 00       	call   4fc8 <write>
@@ -6682,12 +6682,12 @@ bigfile(void)
       exit(0);
     }
     if(buf[0] != i/2 || buf[299] != i/2){
-    426b:	0f be 05 00 94 00 00 	movsbl 0x9400,%eax
+    426b:	0f be 05 20 94 00 00 	movsbl 0x9420,%eax
     4272:	89 da                	mov    %ebx,%edx
     4274:	d1 fa                	sar    %edx
     4276:	39 d0                	cmp    %edx,%eax
     4278:	75 6f                	jne    42e9 <bigfile+0x149>
-    427a:	0f be 15 2b 95 00 00 	movsbl 0x952b,%edx
+    427a:	0f be 15 4b 95 00 00 	movsbl 0x954b,%edx
     4281:	39 d0                	cmp    %edx,%eax
     4283:	75 64                	jne    42e9 <bigfile+0x149>
       printf(1, "read bigfile wrong data\n");
@@ -6705,7 +6705,7 @@ bigfile(void)
     cc = read(fd, buf, 300);
     428e:	c7 44 24 08 2c 01 00 	movl   $0x12c,0x8(%esp)
     4295:	00 
-    4296:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    4296:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     429d:	00 
     429e:	89 3c 24             	mov    %edi,(%esp)
     42a1:	e8 1a 0d 00 00       	call   4fc0 <read>
@@ -6932,8 +6932,8 @@ concreate(void)
     if(pid == 0)
       exit(0);
     else
-      wait(0);
-    4445:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+      wait(&exit_status);
+    4445:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     444c:	e8 5f 0b 00 00       	call   4fb0 <wait>
   } de;
 
@@ -7001,7 +7001,7 @@ concreate(void)
     44ba:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
       exit(0);
     else
-      wait(0);
+      wait(&exit_status);
   }
 
   memset(fa, 0, sizeof(fa));
@@ -7134,8 +7134,8 @@ concreate(void)
     if(pid == 0)
       exit(0);
     else
-      wait(0);
-    45f4:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+      wait(&exit_status);
+    45f4:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     45fb:	e8 b0 09 00 00       	call   4fb0 <wait>
   if(n != 40){
     printf(1, "concreate not enough files in directory listing\n");
@@ -7198,7 +7198,7 @@ concreate(void)
     465c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
       exit(0);
     else
-      wait(0);
+      wait(&exit_status);
   }
 
   printf(1, "concreate ok\n");
@@ -7380,15 +7380,15 @@ fourfiles(void)
   }
 
   for(pi = 0; pi < 4; pi++){
-    wait(0);
-    479c:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    479c:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     47a3:	bb 30 00 00 00       	mov    $0x30,%ebx
     47a8:	e8 03 08 00 00       	call   4fb0 <wait>
-    47ad:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    47ad:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     47b4:	e8 f7 07 00 00       	call   4fb0 <wait>
-    47b9:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    47b9:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     47c0:	e8 eb 07 00 00       	call   4fb0 <wait>
-    47c5:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    47c5:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     47cc:	e8 df 07 00 00       	call   4fb0 <wait>
     47d1:	c7 45 d4 9e 63 00 00 	movl   $0x639e,-0x2c(%ebp)
   }
@@ -7408,7 +7408,7 @@ fourfiles(void)
     while((n = read(fd, buf, sizeof(buf))) > 0){
     47f0:	c7 44 24 08 00 20 00 	movl   $0x2000,0x8(%esp)
     47f7:	00 
-    47f8:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    47f8:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     47ff:	00 
     4800:	89 3c 24             	mov    %edi,(%esp)
     4803:	e8 b8 07 00 00       	call   4fc0 <read>
@@ -7418,7 +7418,7 @@ fourfiles(void)
     480e:	66 90                	xchg   %ax,%ax
       for(j = 0; j < n; j++){
         if(buf[j] != '0'+i){
-    4810:	0f be 8a 00 94 00 00 	movsbl 0x9400(%edx),%ecx
+    4810:	0f be 8a 20 94 00 00 	movsbl 0x9420(%edx),%ecx
     4817:	39 d9                	cmp    %ebx,%ecx
     4819:	75 5b                	jne    4876 <fourfiles+0x146>
   for(i = 0; i < 2; i++){
@@ -7454,7 +7454,7 @@ fourfiles(void)
     4840:	e8 b3 07 00 00       	call   4ff8 <unlink>
 
   for(pi = 0; pi < 4; pi++){
-    wait(0);
+    wait(&exit_status);
   }
 
   for(i = 0; i < 2; i++){
@@ -7479,7 +7479,7 @@ fourfiles(void)
     4865:	c3                   	ret    
 
   for(pi = 0; pi < 4; pi++){
-    wait(0);
+    wait(&exit_status);
   }
 
   for(i = 0; i < 2; i++){
@@ -7531,7 +7531,7 @@ fourfiles(void)
     48b7:	31 db                	xor    %ebx,%ebx
     48b9:	c7 44 24 08 00 02 00 	movl   $0x200,0x8(%esp)
     48c0:	00 
-    48c1:	c7 04 24 00 94 00 00 	movl   $0x9400,(%esp)
+    48c1:	c7 04 24 20 94 00 00 	movl   $0x9420,(%esp)
     48c8:	e8 53 05 00 00       	call   4e20 <memset>
     48cd:	eb 09                	jmp    48d8 <fourfiles+0x1a8>
     48cf:	90                   	nop
@@ -7542,7 +7542,7 @@ fourfiles(void)
         if((n = write(fd, buf, 500)) != 500){
     48d8:	c7 44 24 08 f4 01 00 	movl   $0x1f4,0x8(%esp)
     48df:	00 
-    48e0:	c7 44 24 04 00 94 00 	movl   $0x9400,0x4(%esp)
+    48e0:	c7 44 24 04 20 94 00 	movl   $0x9420,0x4(%esp)
     48e7:	00 
     48e8:	89 34 24             	mov    %esi,(%esp)
     48eb:	e8 d8 06 00 00       	call   4fc8 <write>
@@ -7693,8 +7693,8 @@ sharedfd(void)
     4a35:	0f 84 0f 01 00 00    	je     4b4a <sharedfd+0x1ca>
     exit(0);
   else
-    wait(0);
-    4a3b:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    4a3b:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
   close(fd);
   fd = open("sharedfd", 0);
   if(fd < 0){
@@ -7704,7 +7704,7 @@ sharedfd(void)
   if(pid == 0)
     exit(0);
   else
-    wait(0);
+    wait(&exit_status);
     4a44:	e8 67 05 00 00       	call   4fb0 <wait>
   close(fd);
     4a49:	89 3c 24             	mov    %edi,(%esp)
@@ -7715,7 +7715,7 @@ sharedfd(void)
   if(pid == 0)
     exit(0);
   else
-    wait(0);
+    wait(&exit_status);
   close(fd);
     4a4e:	e8 7d 05 00 00       	call   4fd0 <close>
   fd = open("sharedfd", 0);
@@ -7728,7 +7728,7 @@ sharedfd(void)
   if(pid == 0)
     exit(0);
   else
-    wait(0);
+    wait(&exit_status);
   close(fd);
   fd = open("sharedfd", 0);
     4a69:	89 45 d4             	mov    %eax,-0x2c(%ebp)
@@ -7748,7 +7748,7 @@ sharedfd(void)
     4a8a:	e8 31 05 00 00       	call   4fc0 <read>
     4a8f:	85 c0                	test   %eax,%eax
     4a91:	7e 26                	jle    4ab9 <sharedfd+0x139>
-    wait(0);
+    wait(&exit_status);
   close(fd);
   fd = open("sharedfd", 0);
   if(fd < 0){
@@ -7838,7 +7838,7 @@ sharedfd(void)
     4b16:	5d                   	pop    %ebp
     4b17:	c3                   	ret    
   else
-    wait(0);
+    wait(&exit_status);
   close(fd);
   fd = open("sharedfd", 0);
   if(fd < 0){
@@ -7972,8 +7972,8 @@ mem(void)
     4bec:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
     4bf3:	e8 b0 03 00 00       	call   4fa8 <exit>
   } else {
-    wait(0);
-    4bf8:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    wait(&exit_status);
+    4bf8:	c7 04 24 e0 6c 00 00 	movl   $0x6ce0,(%esp)
     4bff:	e8 ac 03 00 00       	call   4fb0 <wait>
   }
 }
@@ -8771,25 +8771,25 @@ SYSCALL(uptime)
     5047:	c3                   	ret    
 
 00005048 <hello>:
-SYSCALL(hello) 			// added for Lab0
+SYSCALL(hello)
     5048:	b8 16 00 00 00       	mov    $0x16,%eax
     504d:	cd 40                	int    $0x40
     504f:	c3                   	ret    
 
 00005050 <waitpid>:
-SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(waitpid)
     5050:	b8 17 00 00 00       	mov    $0x17,%eax
     5055:	cd 40                	int    $0x40
     5057:	c3                   	ret    
 
 00005058 <setpriority>:
-SYSCALL(setpriority) 	// lab1 part 2: define syscall
+SYSCALL(setpriority)
     5058:	b8 18 00 00 00       	mov    $0x18,%eax
     505d:	cd 40                	int    $0x40
     505f:	c3                   	ret    
 
 00005060 <v2p>:
-SYSCALL(v2p)			// lab2
+SYSCALL(v2p)
     5060:	b8 19 00 00 00       	mov    $0x19,%eax
     5065:	cd 40                	int    $0x40
     5067:	c3                   	ret    

@@ -14,59 +14,69 @@ sys_fork(void)
 }
 
 int
-sys_exit(void) // modified exit to handle a exit status (lab1 part1: a)
+sys_exit(void)
 {
   int status;
+  if(argint(0, &status) > 0)
+    return -1;
+  exit(status);
+  return 0;
+}
+
+int
+sys_wait(void)
+{
+  int *status;
+
+  if(argptr(0, (char**)&status, sizeof(int)) > 0)
+    return -1;
+
+  return wait(status);
+}
+
+int
+sys_waitpid(void)
+{
+  int pid;
+  int *status;
+  int options;
+
+  if(argint(0, &pid) < 0)
+    return -1;
+
+  if(argptr(1, (char**)&status, sizeof(int)) > 0)
+    return -1;
   
-  if (argint(0, &status) > 0) {
-	  return -1;  
-  }
-  else{
-	 exit(status);   
-  }
-  return 0;  // not reached
+  if(argint(2, &options) > 100)
+    return -1;
+
+  return waitpid(pid, status, options);
 }
 
 int
-sys_wait(void) // update sys_wait to wiat for a process with a pod that equals the one provided by the waitStatus argument (lab1 part1b)
+sys_setpriority(void)
 {
-  int *waitStatus;
+  int priority;
 
-  if (argptr(0, (char**)&waitStatus, sizeof(int)) > 0) {
-	  return -1;
-  }
-  return wait(waitStatus);
+  if(argint(0, &priority) < 0)
+    return -1;
+  setpriority(priority);
+  return 0;
 }
 
 int
-sys_waitpid(void) //  Added waitpid sstem call which waits for a process with a pid that is equal to the pid provided by the argumet handles errors
+sys_v2p(void)
 {
-	int pid;
-	int *waitStatus;
-	int arg;
-	
-	if(argint(0, &pid) < 0) {
-		return -1;
-	}
-	if(argptr(1, (char**)&waitStatus, sizeof(int)) > 0){
-		return -1;
-	}
-	if(argint(2, &arg) > 100) {
-		return -1;
-	}
+  int virt;
+  int *physical;
 
-	return(waitpid(pid,waitStatus,arg));
-}
+  if(argint(0, &virt) < 0)
+    return -1;
 
-int 
-sys_setpriority(void) { //added the setpriority system call so that it takes 2 arguments. (lab1 part2)
-	//int pid;
-	int priority;
-	if(argint(0, &priority) < 0){
-		return -1;
-	}
-	setpriority(priority);
-	return 0;
+  if(argptr(1, (char**)&physical, sizeof(int)) < 0)
+    return -1;
+  
+  return v2p(virt, physical);
 }
 
 int
@@ -132,24 +142,10 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
 int
 sys_hello(void)
 {
   hello();
   return 0;
 }
-
-int
-sys_v2p(void)		//lab2 part 1
-{
-	int* virtual;
-	int* physical;
-	if(argptr(0, (char**)&virtual, sizeof(int*)) < 0)
-		return -1;
-	if(argptr(1, (char**)&physical, sizeof(int*)) < 0)
-		return -1;
-	return v2p(virtual, physical);
-}
-
-
-

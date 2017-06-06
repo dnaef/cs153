@@ -3,8 +3,8 @@ struct rtcdate;
 
 // system calls
 int fork(void);
-int exit(int status) __attribute__((noreturn)); // lab1 part 1: a
-int wait(int *status);                          // lab1 part 1: b
+int exit(int) __attribute__((noreturn));
+int wait(int *status);
 int pipe(int*);
 int write(int, void*, int);
 int read(int, void*, int);
@@ -23,11 +23,10 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-void hello(void);
-int waitpid(int pid, int *status, int options); // lab1 part 1: c
-int setpriority(int priority);			// lab1 part 2: allows for adding a priority value to each process
-int v2p(int* virtual, int* physical);   // lab2 part 1: takes a virtual address and returns the physical address
-
+int hello(void);
+int waitpid(int pid, int *status, int options);
+int setpriority(int);
+int v2p(int virt, int *physical);
 // ulib.c
 int stat(char*, struct stat*);
 char* strcpy(char*, char*);

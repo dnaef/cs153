@@ -63,9 +63,8 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  // added process states
-  int status;				   // Part 1a - Exit status of the program
-  int priority;				   // Part 2 - store a priority from 0-63
+  int status;
+  int priority;
 };
 
 // Process memory is laid out contiguously, low addresses first:

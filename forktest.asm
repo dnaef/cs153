@@ -39,27 +39,27 @@ forktest(void)
 {
     1030:	55                   	push   %ebp
     1031:	89 e5                	mov    %esp,%ebp
-    1033:	53                   	push   %ebx
-  int n, pid;
+    1033:	56                   	push   %esi
+    1034:	53                   	push   %ebx
+  int n, pid, exit_status;
 
   printf(1, "fork test\n");
-    1034:	31 db                	xor    %ebx,%ebx
+    1035:	31 db                	xor    %ebx,%ebx
   write(fd, s, strlen(s));
 }
 
 void
 forktest(void)
 {
-    1036:	83 ec 14             	sub    $0x14,%esp
-  int n, pid;
+    1037:	83 ec 20             	sub    $0x20,%esp
+  int n, pid, exit_status;
 
   printf(1, "fork test\n");
-    1039:	c7 44 24 04 28 14 00 	movl   $0x1428,0x4(%esp)
-    1040:	00 
-    1041:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-    1048:	e8 b3 ff ff ff       	call   1000 <printf>
-    104d:	eb 0e                	jmp    105d <forktest+0x2d>
-    104f:	90                   	nop
+    103a:	c7 44 24 04 28 14 00 	movl   $0x1428,0x4(%esp)
+    1041:	00 
+    1042:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+    1049:	e8 b2 ff ff ff       	call   1000 <printf>
+    104e:	eb 0d                	jmp    105d <forktest+0x2d>
 
   for(n=0; n<N; n++){
     pid = fork();
@@ -68,7 +68,7 @@ forktest(void)
     if(pid == 0)
     1050:	74 7a                	je     10cc <forktest+0x9c>
 {
-  int n, pid;
+  int n, pid, exit_status;
 
   printf(1, "fork test\n");
 
@@ -88,46 +88,48 @@ forktest(void)
 
   for(; n > 0; n--){
     1067:	85 db                	test   %ebx,%ebx
-    1069:	74 1a                	je     1085 <forktest+0x55>
-    106b:	90                   	nop
-    106c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-    if(wait(0) < 0){
-    1070:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1077:	e8 f4 02 00 00       	call   1370 <wait>
-    107c:	85 c0                	test   %eax,%eax
-    107e:	78 58                	js     10d8 <forktest+0xa8>
+    1069:	8d 75 f4             	lea    -0xc(%ebp),%esi
+    106c:	74 13                	je     1081 <forktest+0x51>
+    106e:	66 90                	xchg   %ax,%ax
+    if(wait(&exit_status) < 0){
+    1070:	89 34 24             	mov    %esi,(%esp)
+    1073:	e8 f8 02 00 00       	call   1370 <wait>
+    1078:	85 c0                	test   %eax,%eax
+    107a:	78 5c                	js     10d8 <forktest+0xa8>
   if(n == N){
     printf(1, "fork claimed to work N times!\n", N);
     exit(0);
   }
 
   for(; n > 0; n--){
-    1080:	83 eb 01             	sub    $0x1,%ebx
-    1083:	75 eb                	jne    1070 <forktest+0x40>
+    107c:	83 eb 01             	sub    $0x1,%ebx
+    107f:	75 ef                	jne    1070 <forktest+0x40>
       printf(1, "wait stopped early\n");
       exit(0);
     }
   }
 
-  if(wait(0) != -1){
-    1085:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    108c:	e8 df 02 00 00       	call   1370 <wait>
-    1091:	83 f8 ff             	cmp    $0xffffffff,%eax
-    1094:	75 62                	jne    10f8 <forktest+0xc8>
+  if(wait(&exit_status) != -1){
+    1081:	89 34 24             	mov    %esi,(%esp)
+    1084:	e8 e7 02 00 00       	call   1370 <wait>
+    1089:	83 f8 ff             	cmp    $0xffffffff,%eax
+    108c:	75 6a                	jne    10f8 <forktest+0xc8>
     printf(1, "wait got too many\n");
     exit(0);
   }
 
   printf(1, "fork test OK\n");
-    1096:	c7 44 24 04 5a 14 00 	movl   $0x145a,0x4(%esp)
-    109d:	00 
-    109e:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-    10a5:	e8 56 ff ff ff       	call   1000 <printf>
+    108e:	c7 44 24 04 5a 14 00 	movl   $0x145a,0x4(%esp)
+    1095:	00 
+    1096:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+    109d:	e8 5e ff ff ff       	call   1000 <printf>
 }
-    10aa:	83 c4 14             	add    $0x14,%esp
-    10ad:	5b                   	pop    %ebx
-    10ae:	5d                   	pop    %ebp
-    10af:	c3                   	ret    
+    10a2:	83 c4 20             	add    $0x20,%esp
+    10a5:	5b                   	pop    %ebx
+    10a6:	5e                   	pop    %esi
+    10a7:	5d                   	pop    %ebp
+    10a8:	c3                   	ret    
+    10a9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
     if(pid == 0)
       exit(0);
   }
@@ -146,7 +148,7 @@ forktest(void)
   }
 
   for(; n > 0; n--){
-    if(wait(0) < 0){
+    if(wait(&exit_status) < 0){
       printf(1, "wait stopped early\n");
     10d8:	c7 44 24 04 33 14 00 	movl   $0x1433,0x4(%esp)
     10df:	00 
@@ -158,7 +160,7 @@ forktest(void)
     }
   }
 
-  if(wait(0) != -1){
+  if(wait(&exit_status) != -1){
     printf(1, "wait got too many\n");
     10f8:	c7 44 24 04 47 14 00 	movl   $0x1447,0x4(%esp)
     10ff:	00 
@@ -821,25 +823,25 @@ SYSCALL(uptime)
     1407:	c3                   	ret    
 
 00001408 <hello>:
-SYSCALL(hello) 			// added for Lab0
+SYSCALL(hello)
     1408:	b8 16 00 00 00       	mov    $0x16,%eax
     140d:	cd 40                	int    $0x40
     140f:	c3                   	ret    
 
 00001410 <waitpid>:
-SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(waitpid)
     1410:	b8 17 00 00 00       	mov    $0x17,%eax
     1415:	cd 40                	int    $0x40
     1417:	c3                   	ret    
 
 00001418 <setpriority>:
-SYSCALL(setpriority) 	// lab1 part 2: define syscall
+SYSCALL(setpriority)
     1418:	b8 18 00 00 00       	mov    $0x18,%eax
     141d:	cd 40                	int    $0x40
     141f:	c3                   	ret    
 
 00001420 <v2p>:
-SYSCALL(v2p)			// lab2
+SYSCALL(v2p)
     1420:	b8 19 00 00 00       	mov    $0x19,%eax
     1425:	cd 40                	int    $0x40
     1427:	c3                   	ret    

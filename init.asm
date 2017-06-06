@@ -14,70 +14,72 @@ main(void)
     1000:	55                   	push   %ebp
     1001:	89 e5                	mov    %esp,%ebp
     1003:	83 e4 f0             	and    $0xfffffff0,%esp
-    1006:	53                   	push   %ebx
-    1007:	83 ec 1c             	sub    $0x1c,%esp
-  int pid, wpid;
+    1006:	56                   	push   %esi
+    1007:	53                   	push   %ebx
+    1008:	83 ec 28             	sub    $0x28,%esp
+  int pid, wpid, exit_status;
 
   if(open("console", O_RDWR) < 0){
-    100a:	c7 44 24 04 02 00 00 	movl   $0x2,0x4(%esp)
-    1011:	00 
-    1012:	c7 04 24 06 18 00 00 	movl   $0x1806,(%esp)
-    1019:	e8 6a 03 00 00       	call   1388 <open>
-    101e:	85 c0                	test   %eax,%eax
-    1020:	0f 88 be 00 00 00    	js     10e4 <main+0xe4>
+    100b:	c7 44 24 04 02 00 00 	movl   $0x2,0x4(%esp)
+    1012:	00 
+    1013:	c7 04 24 06 18 00 00 	movl   $0x1806,(%esp)
+    101a:	e8 69 03 00 00       	call   1388 <open>
+    101f:	85 c0                	test   %eax,%eax
+    1021:	0f 88 bd 00 00 00    	js     10e4 <main+0xe4>
     mknod("console", 1, 1);
     open("console", O_RDWR);
   }
   dup(0);  // stdout
-    1026:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    102d:	e8 8e 03 00 00       	call   13c0 <dup>
+    1027:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    102e:	8d 74 24 1c          	lea    0x1c(%esp),%esi
+    1032:	e8 89 03 00 00       	call   13c0 <dup>
   dup(0);  // stderr
-    1032:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1039:	e8 82 03 00 00       	call   13c0 <dup>
-    103e:	66 90                	xchg   %ax,%ax
+    1037:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    103e:	e8 7d 03 00 00       	call   13c0 <dup>
+    1043:	90                   	nop
+    1044:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
 
   for(;;){
     printf(1, "init: starting sh\n");
-    1040:	c7 44 24 04 0e 18 00 	movl   $0x180e,0x4(%esp)
-    1047:	00 
-    1048:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-    104f:	e8 4c 04 00 00       	call   14a0 <printf>
+    1048:	c7 44 24 04 0e 18 00 	movl   $0x180e,0x4(%esp)
+    104f:	00 
+    1050:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+    1057:	e8 44 04 00 00       	call   14a0 <printf>
     pid = fork();
-    1054:	e8 e7 02 00 00       	call   1340 <fork>
+    105c:	e8 df 02 00 00       	call   1340 <fork>
     if(pid < 0){
-    1059:	83 f8 00             	cmp    $0x0,%eax
+    1061:	83 f8 00             	cmp    $0x0,%eax
   dup(0);  // stdout
   dup(0);  // stderr
 
   for(;;){
     printf(1, "init: starting sh\n");
     pid = fork();
-    105c:	89 c3                	mov    %eax,%ebx
+    1064:	89 c3                	mov    %eax,%ebx
     if(pid < 0){
-    105e:	7c 30                	jl     1090 <main+0x90>
+    1066:	7c 28                	jl     1090 <main+0x90>
       printf(1, "init: fork failed\n");
       exit(0);
     }
     if(pid == 0){
-    1060:	74 4e                	je     10b0 <main+0xb0>
+    1068:	74 46                	je     10b0 <main+0xb0>
       exec("sh", argv);
       printf(1, "init: exec sh failed\n");
       exit(0);
     }
-    while((wpid=wait(0)) >= 0 && wpid != pid)
-    1062:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1069:	e8 e2 02 00 00       	call   1350 <wait>
-    106e:	85 c0                	test   %eax,%eax
-    1070:	78 ce                	js     1040 <main+0x40>
-    1072:	39 c3                	cmp    %eax,%ebx
-    1074:	74 ca                	je     1040 <main+0x40>
+    while((wpid=wait(&exit_status)) >= 0 && wpid != pid)
+    106a:	89 34 24             	mov    %esi,(%esp)
+    106d:	e8 de 02 00 00       	call   1350 <wait>
+    1072:	85 c0                	test   %eax,%eax
+    1074:	78 d2                	js     1048 <main+0x48>
+    1076:	39 c3                	cmp    %eax,%ebx
+    1078:	74 ce                	je     1048 <main+0x48>
       printf(1, "zombie!\n");
-    1076:	c7 44 24 04 4d 18 00 	movl   $0x184d,0x4(%esp)
-    107d:	00 
-    107e:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
-    1085:	e8 16 04 00 00       	call   14a0 <printf>
-    108a:	eb d6                	jmp    1062 <main+0x62>
-    108c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+    107a:	c7 44 24 04 4d 18 00 	movl   $0x184d,0x4(%esp)
+    1081:	00 
+    1082:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
+    1089:	e8 12 04 00 00       	call   14a0 <printf>
+    108e:	eb da                	jmp    106a <main+0x6a>
 
   for(;;){
     printf(1, "init: starting sh\n");
@@ -108,7 +110,7 @@ main(void)
     10df:	e8 64 02 00 00       	call   1348 <exit>
 main(void)
 {
-  int pid, wpid;
+  int pid, wpid, exit_status;
 
   if(open("console", O_RDWR) < 0){
     mknod("console", 1, 1);
@@ -123,7 +125,7 @@ main(void)
     1107:	00 
     1108:	c7 04 24 06 18 00 00 	movl   $0x1806,(%esp)
     110f:	e8 74 02 00 00       	call   1388 <open>
-    1114:	e9 0d ff ff ff       	jmp    1026 <main+0x26>
+    1114:	e9 0e ff ff ff       	jmp    1027 <main+0x27>
     1119:	90                   	nop
     111a:	90                   	nop
     111b:	90                   	nop
@@ -760,25 +762,25 @@ SYSCALL(uptime)
     13e7:	c3                   	ret    
 
 000013e8 <hello>:
-SYSCALL(hello) 			// added for Lab0
+SYSCALL(hello)
     13e8:	b8 16 00 00 00       	mov    $0x16,%eax
     13ed:	cd 40                	int    $0x40
     13ef:	c3                   	ret    
 
 000013f0 <waitpid>:
-SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(waitpid)
     13f0:	b8 17 00 00 00       	mov    $0x17,%eax
     13f5:	cd 40                	int    $0x40
     13f7:	c3                   	ret    
 
 000013f8 <setpriority>:
-SYSCALL(setpriority) 	// lab1 part 2: define syscall
+SYSCALL(setpriority)
     13f8:	b8 18 00 00 00       	mov    $0x18,%eax
     13fd:	cd 40                	int    $0x40
     13ff:	c3                   	ret    
 
 00001400 <v2p>:
-SYSCALL(v2p)			// lab2
+SYSCALL(v2p)
     1400:	b8 19 00 00 00       	mov    $0x19,%eax
     1405:	cd 40                	int    $0x40
     1407:	c3                   	ret    

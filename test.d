@@ -1,1 +1,1 @@
-test.o: test.c types.h stat.h user.h
+test.o: test.c types.h user.h

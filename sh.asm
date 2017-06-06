@@ -1545,7 +1545,7 @@ runcmd(struct cmd *cmd)
     19c0:	8b 03                	mov    (%ebx),%eax
     19c2:	ff 24 85 a0 23 00 00 	jmp    *0x23a0(,%eax,4)
     19c9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-    wait(0);
+    wait(&exit_status);
     break;
 
   case BACK:
@@ -1571,28 +1571,30 @@ runcmd(struct cmd *cmd)
     19f5:	85 c0                	test   %eax,%eax
     19f7:	0f 84 cb 00 00 00    	je     1ac8 <runcmd+0x168>
       runcmd(lcmd->left);
-    wait(0);
-    19fd:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1a04:	e8 c7 04 00 00       	call   1ed0 <wait>
+    wait(&exit_status);
+    19fd:	8d 45 f4             	lea    -0xc(%ebp),%eax
+    1a00:	89 04 24             	mov    %eax,(%esp)
+    1a03:	e8 c8 04 00 00       	call   1ed0 <wait>
     runcmd(lcmd->right);
-    1a09:	8b 43 08             	mov    0x8(%ebx),%eax
-    1a0c:	89 04 24             	mov    %eax,(%esp)
-    1a0f:	e8 4c ff ff ff       	call   1960 <runcmd>
+    1a08:	8b 43 08             	mov    0x8(%ebx),%eax
+    1a0b:	89 04 24             	mov    %eax,(%esp)
+    1a0e:	e8 4d ff ff ff       	call   1960 <runcmd>
     bcmd = (struct backcmd*)cmd;
     if(fork1() == 0)
       runcmd(bcmd->cmd);
     break;
   }
   exit(0);
-    1a14:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1a1b:	e8 a8 04 00 00       	call   1ec8 <exit>
+    1a13:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    1a1a:	e8 a9 04 00 00       	call   1ec8 <exit>
+    1a1f:	90                   	nop
     runcmd(lcmd->right);
     break;
 
   case PIPE:
     pcmd = (struct pipecmd*)cmd;
     if(pipe(p) < 0)
-    1a20:	8d 45 f0             	lea    -0x10(%ebp),%eax
+    1a20:	8d 45 ec             	lea    -0x14(%ebp),%eax
     1a23:	89 04 24             	mov    %eax,(%esp)
     1a26:	e8 ad 04 00 00       	call   1ed8 <pipe>
     1a2b:	85 c0                	test   %eax,%eax
@@ -1617,28 +1619,37 @@ runcmd(struct cmd *cmd)
       runcmd(pcmd->right);
     }
     close(p[0]);
-    1a4d:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    1a50:	89 04 24             	mov    %eax,(%esp)
-    1a53:	e8 98 04 00 00       	call   1ef0 <close>
+    1a4d:	8b 45 ec             	mov    -0x14(%ebp),%eax
     close(p[1]);
-    1a58:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    1a5b:	89 04 24             	mov    %eax,(%esp)
-    1a5e:	e8 8d 04 00 00       	call   1ef0 <close>
-    wait(0);
-    1a63:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1a6a:	e8 61 04 00 00       	call   1ed0 <wait>
-    wait(0);
-    1a6f:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1a76:	e8 55 04 00 00       	call   1ed0 <wait>
+    wait(&exit_status);
+    1a50:	8d 5d f4             	lea    -0xc(%ebp),%ebx
+      dup(p[0]);
+      close(p[0]);
+      close(p[1]);
+      runcmd(pcmd->right);
+    }
+    close(p[0]);
+    1a53:	89 04 24             	mov    %eax,(%esp)
+    1a56:	e8 95 04 00 00       	call   1ef0 <close>
+    close(p[1]);
+    1a5b:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    1a5e:	89 04 24             	mov    %eax,(%esp)
+    1a61:	e8 8a 04 00 00       	call   1ef0 <close>
+    wait(&exit_status);
+    1a66:	89 1c 24             	mov    %ebx,(%esp)
+    1a69:	e8 62 04 00 00       	call   1ed0 <wait>
+    wait(&exit_status);
+    1a6e:	89 1c 24             	mov    %ebx,(%esp)
+    1a71:	e8 5a 04 00 00       	call   1ed0 <wait>
     bcmd = (struct backcmd*)cmd;
     if(fork1() == 0)
       runcmd(bcmd->cmd);
     break;
   }
   exit(0);
-    1a7b:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1a82:	e8 41 04 00 00       	call   1ec8 <exit>
-    1a87:	90                   	nop
+    1a76:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    1a7d:	e8 46 04 00 00       	call   1ec8 <exit>
+    1a82:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
     printf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
 
@@ -1690,15 +1701,15 @@ runcmd(struct cmd *cmd)
     1ad8:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
     1adf:	e8 0c 04 00 00       	call   1ef0 <close>
       dup(p[0]);
-    1ae4:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    1ae4:	8b 45 ec             	mov    -0x14(%ebp),%eax
     1ae7:	89 04 24             	mov    %eax,(%esp)
     1aea:	e8 51 04 00 00       	call   1f40 <dup>
       close(p[0]);
-    1aef:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    1aef:	8b 45 ec             	mov    -0x14(%ebp),%eax
     1af2:	89 04 24             	mov    %eax,(%esp)
     1af5:	e8 f6 03 00 00       	call   1ef0 <close>
       close(p[1]);
-    1afa:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    1afa:	8b 45 f0             	mov    -0x10(%ebp),%eax
     1afd:	89 04 24             	mov    %eax,(%esp)
     1b00:	e8 eb 03 00 00       	call   1ef0 <close>
       runcmd(pcmd->right);
@@ -1716,15 +1727,15 @@ runcmd(struct cmd *cmd)
     1b18:	c7 04 24 01 00 00 00 	movl   $0x1,(%esp)
     1b1f:	e8 cc 03 00 00       	call   1ef0 <close>
       dup(p[1]);
-    1b24:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    1b24:	8b 45 f0             	mov    -0x10(%ebp),%eax
     1b27:	89 04 24             	mov    %eax,(%esp)
     1b2a:	e8 11 04 00 00       	call   1f40 <dup>
       close(p[0]);
-    1b2f:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    1b2f:	8b 45 ec             	mov    -0x14(%ebp),%eax
     1b32:	89 04 24             	mov    %eax,(%esp)
     1b35:	e8 b6 03 00 00       	call   1ef0 <close>
       close(p[1]);
-    1b3a:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    1b3a:	8b 45 f0             	mov    -0x10(%ebp),%eax
     1b3d:	89 04 24             	mov    %eax,(%esp)
     1b40:	e8 ab 03 00 00       	call   1ef0 <close>
       runcmd(pcmd->left);
@@ -1783,10 +1794,11 @@ main(void)
     1ba0:	55                   	push   %ebp
     1ba1:	89 e5                	mov    %esp,%ebp
     1ba3:	83 e4 f0             	and    $0xfffffff0,%esp
-    1ba6:	83 ec 10             	sub    $0x10,%esp
-    1ba9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+    1ba6:	53                   	push   %ebx
+    1ba7:	83 ec 2c             	sub    $0x2c,%esp
+    1baa:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   static char buf[100];
-  int fd;
+  int fd, exit_status;
 
   // Ensure that three file descriptors are open.
   while((fd = open("console", O_RDWR)) >= 0){
@@ -1795,57 +1807,58 @@ main(void)
     1bb8:	c7 04 24 59 24 00 00 	movl   $0x2459,(%esp)
     1bbf:	e8 44 03 00 00       	call   1f08 <open>
     1bc4:	85 c0                	test   %eax,%eax
-    1bc6:	78 2f                	js     1bf7 <main+0x57>
+    1bc6:	78 0d                	js     1bd5 <main+0x35>
     if(fd >= 3){
     1bc8:	83 f8 02             	cmp    $0x2,%eax
     1bcb:	7e e3                	jle    1bb0 <main+0x10>
       close(fd);
     1bcd:	89 04 24             	mov    %eax,(%esp)
     1bd0:	e8 1b 03 00 00       	call   1ef0 <close>
-      break;
-    1bd5:	eb 20                	jmp    1bf7 <main+0x57>
-      if(chdir(buf+3) < 0)
         printf(2, "cannot cd %s\n", buf+3);
       continue;
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    1bd7:	c7 04 24 a0 24 00 00 	movl   $0x24a0,(%esp)
-    1bde:	e8 6d fc ff ff       	call   1850 <parsecmd>
-    1be3:	89 04 24             	mov    %eax,(%esp)
-    1be6:	e8 75 fd ff ff       	call   1960 <runcmd>
-    wait(0);
-    1beb:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1bf2:	e8 d9 02 00 00       	call   1ed0 <wait>
+    wait(&exit_status);
+    1bd5:	8d 5c 24 1c          	lea    0x1c(%esp),%ebx
+    1bd9:	eb 0d                	jmp    1be8 <main+0x48>
+    1bdb:	90                   	nop
+    1bdc:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+    1be0:	89 1c 24             	mov    %ebx,(%esp)
+    1be3:	e8 e8 02 00 00       	call   1ed0 <wait>
       break;
     }
   }
 
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
-    1bf7:	c7 44 24 04 64 00 00 	movl   $0x64,0x4(%esp)
-    1bfe:	00 
-    1bff:	c7 04 24 a0 24 00 00 	movl   $0x24a0,(%esp)
-    1c06:	e8 f5 fc ff ff       	call   1900 <getcmd>
-    1c0b:	85 c0                	test   %eax,%eax
-    1c0d:	78 79                	js     1c88 <main+0xe8>
+    1be8:	c7 44 24 04 64 00 00 	movl   $0x64,0x4(%esp)
+    1bef:	00 
+    1bf0:	c7 04 24 a0 24 00 00 	movl   $0x24a0,(%esp)
+    1bf7:	e8 04 fd ff ff       	call   1900 <getcmd>
+    1bfc:	85 c0                	test   %eax,%eax
+    1bfe:	0f 88 84 00 00 00    	js     1c88 <main+0xe8>
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
-    1c0f:	80 3d a0 24 00 00 63 	cmpb   $0x63,0x24a0
-    1c16:	75 09                	jne    1c21 <main+0x81>
-    1c18:	80 3d a1 24 00 00 64 	cmpb   $0x64,0x24a1
-    1c1f:	74 17                	je     1c38 <main+0x98>
+    1c04:	80 3d a0 24 00 00 63 	cmpb   $0x63,0x24a0
+    1c0b:	75 09                	jne    1c16 <main+0x76>
+    1c0d:	80 3d a1 24 00 00 64 	cmpb   $0x64,0x24a1
+    1c14:	74 22                	je     1c38 <main+0x98>
       buf[strlen(buf)-1] = 0;  // chop \n
       if(chdir(buf+3) < 0)
         printf(2, "cannot cd %s\n", buf+3);
       continue;
     }
     if(fork1() == 0)
-    1c21:	e8 aa fc ff ff       	call   18d0 <fork1>
-    1c26:	85 c0                	test   %eax,%eax
-    1c28:	75 c1                	jne    1beb <main+0x4b>
-    1c2a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-    1c30:	eb a5                	jmp    1bd7 <main+0x37>
-    1c32:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+    1c16:	e8 b5 fc ff ff       	call   18d0 <fork1>
+    1c1b:	85 c0                	test   %eax,%eax
+    1c1d:	75 c1                	jne    1be0 <main+0x40>
+      runcmd(parsecmd(buf));
+    1c1f:	c7 04 24 a0 24 00 00 	movl   $0x24a0,(%esp)
+    1c26:	e8 25 fc ff ff       	call   1850 <parsecmd>
+    1c2b:	89 04 24             	mov    %eax,(%esp)
+    1c2e:	e8 2d fd ff ff       	call   1960 <runcmd>
+    1c33:	eb ab                	jmp    1be0 <main+0x40>
+    1c35:	8d 76 00             	lea    0x0(%esi),%esi
     }
   }
 
@@ -1853,38 +1866,37 @@ main(void)
   while(getcmd(buf, sizeof(buf)) >= 0){
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
     1c38:	80 3d a2 24 00 00 20 	cmpb   $0x20,0x24a2
-    1c3f:	90                   	nop
-    1c40:	75 df                	jne    1c21 <main+0x81>
+    1c3f:	75 d5                	jne    1c16 <main+0x76>
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
-    1c42:	c7 04 24 a0 24 00 00 	movl   $0x24a0,(%esp)
-    1c49:	e8 d2 00 00 00       	call   1d20 <strlen>
+    1c41:	c7 04 24 a0 24 00 00 	movl   $0x24a0,(%esp)
+    1c48:	e8 d3 00 00 00       	call   1d20 <strlen>
       if(chdir(buf+3) < 0)
-    1c4e:	c7 04 24 a3 24 00 00 	movl   $0x24a3,(%esp)
+    1c4d:	c7 04 24 a3 24 00 00 	movl   $0x24a3,(%esp)
 
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
-    1c55:	c6 80 9f 24 00 00 00 	movb   $0x0,0x249f(%eax)
+    1c54:	c6 80 9f 24 00 00 00 	movb   $0x0,0x249f(%eax)
       if(chdir(buf+3) < 0)
-    1c5c:	e8 d7 02 00 00       	call   1f38 <chdir>
-    1c61:	85 c0                	test   %eax,%eax
-    1c63:	79 92                	jns    1bf7 <main+0x57>
+    1c5b:	e8 d8 02 00 00       	call   1f38 <chdir>
+    1c60:	85 c0                	test   %eax,%eax
+    1c62:	79 84                	jns    1be8 <main+0x48>
         printf(2, "cannot cd %s\n", buf+3);
-    1c65:	c7 44 24 08 a3 24 00 	movl   $0x24a3,0x8(%esp)
-    1c6c:	00 
-    1c6d:	c7 44 24 04 61 24 00 	movl   $0x2461,0x4(%esp)
-    1c74:	00 
-    1c75:	c7 04 24 02 00 00 00 	movl   $0x2,(%esp)
-    1c7c:	e8 9f 03 00 00       	call   2020 <printf>
-    1c81:	e9 71 ff ff ff       	jmp    1bf7 <main+0x57>
-    1c86:	66 90                	xchg   %ax,%ax
+    1c64:	c7 44 24 08 a3 24 00 	movl   $0x24a3,0x8(%esp)
+    1c6b:	00 
+    1c6c:	c7 44 24 04 61 24 00 	movl   $0x2461,0x4(%esp)
+    1c73:	00 
+    1c74:	c7 04 24 02 00 00 00 	movl   $0x2,(%esp)
+    1c7b:	e8 a0 03 00 00       	call   2020 <printf>
+    1c80:	e9 63 ff ff ff       	jmp    1be8 <main+0x48>
+    1c85:	8d 76 00             	lea    0x0(%esi),%esi
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    wait(0);
+    wait(&exit_status);
   }
   exit(0);
     1c88:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
@@ -2530,25 +2542,25 @@ SYSCALL(uptime)
     1f67:	c3                   	ret    
 
 00001f68 <hello>:
-SYSCALL(hello) 			// added for Lab0
+SYSCALL(hello)
     1f68:	b8 16 00 00 00       	mov    $0x16,%eax
     1f6d:	cd 40                	int    $0x40
     1f6f:	c3                   	ret    
 
 00001f70 <waitpid>:
-SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(waitpid)
     1f70:	b8 17 00 00 00       	mov    $0x17,%eax
     1f75:	cd 40                	int    $0x40
     1f77:	c3                   	ret    
 
 00001f78 <setpriority>:
-SYSCALL(setpriority) 	// lab1 part 2: define syscall
+SYSCALL(setpriority)
     1f78:	b8 18 00 00 00       	mov    $0x18,%eax
     1f7d:	cd 40                	int    $0x40
     1f7f:	c3                   	ret    
 
 00001f80 <v2p>:
-SYSCALL(v2p)			// lab2
+SYSCALL(v2p)
     1f80:	b8 19 00 00 00       	mov    $0x19,%eax
     1f85:	cd 40                	int    $0x40
     1f87:	c3                   	ret    

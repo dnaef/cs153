@@ -103,7 +103,7 @@ int             pipewrite(struct pipe*, char*, int);
 
 //PAGEBREAK: 16
 // proc.c
-void            exit(int status);							//added lab1 part1a
+void            exit(int);
 int             fork(void);
 int             growproc(int);
 int             kill(int);
@@ -113,13 +113,13 @@ void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
-int             wait(int *status);							//added lab1 part1b
-int				waitpid(int pid, int *status, int options); 	//added lab1 part1c
-int				setpriority(int priority); //added lab1 part2
-int 			v2p(int* virtual, int* physical); //added lab2 part1&2
+int             wait(int *);
 void            wakeup(void*);
 void            yield(void);
-void 			hello(void);
+void		hello(void);
+int             waitpid(int, int *, int);
+void            setpriority(int);
+int             v2p(int, int*);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -165,8 +165,6 @@ extern uint     ticks;
 void            tvinit(void);
 extern struct spinlock tickslock;
 
-
-
 // uart.c
 void            uartinit(void);
 void            uartintr(void);
@@ -182,7 +180,7 @@ int             deallocuvm(pde_t*, uint, uint);
 void            freevm(pde_t*);
 void            inituvm(pde_t*, char*, uint);
 int             loaduvm(pde_t*, char*, struct inode*, uint, uint);
-pde_t*          copyuvm(pde_t*, uint, uint);
+pde_t*          copyuvm(pde_t*, uint,uint);
 void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);

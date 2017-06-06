@@ -720,25 +720,25 @@ SYSCALL(uptime)
     1357:	c3                   	ret    
 
 00001358 <hello>:
-SYSCALL(hello) 			// added for Lab0
+SYSCALL(hello)
     1358:	b8 16 00 00 00       	mov    $0x16,%eax
     135d:	cd 40                	int    $0x40
     135f:	c3                   	ret    
 
 00001360 <waitpid>:
-SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(waitpid)
     1360:	b8 17 00 00 00       	mov    $0x17,%eax
     1365:	cd 40                	int    $0x40
     1367:	c3                   	ret    
 
 00001368 <setpriority>:
-SYSCALL(setpriority) 	// lab1 part 2: define syscall
+SYSCALL(setpriority)
     1368:	b8 18 00 00 00       	mov    $0x18,%eax
     136d:	cd 40                	int    $0x40
     136f:	c3                   	ret    
 
 00001370 <v2p>:
-SYSCALL(v2p)			// lab2
+SYSCALL(v2p)
     1370:	b8 19 00 00 00       	mov    $0x19,%eax
     1375:	cd 40                	int    $0x40
     1377:	c3                   	ret    

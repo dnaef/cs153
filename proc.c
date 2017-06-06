@@ -49,8 +49,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-
-  p->priority = 20; 	//lab1 part2 sceduling - set default priority to lowest priority
+  p->priority = 20;
 
   release(&ptable.lock);
 
@@ -151,7 +150,7 @@ fork(void)
   }
 
   // Copy process state from p.
-  if((np->pgdir = copyuvm(proc->pgdir, proc->sz, proc->tf->esp)) == 0){
+  if((np->pgdir = copyuvm(proc->pgdir, proc->sz,proc->tf->esp)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
@@ -184,12 +183,14 @@ fork(void)
 
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
-// until its parent calls wait(0) to find out it exited.
+// until its parent calls wait() to find out it exited.
 void
-exit(int status) // lab 1 part1a change to int status
+exit(int status)
 {
   struct proc *p;
   int fd;
+
+  proc->status = status;
 
   if(proc == initproc)
     panic("init exiting");
@@ -202,9 +203,6 @@ exit(int status) // lab 1 part1a change to int status
     }
   }
 
-  // save exit status
-  proc->status = status; //lab1 part1a return exit status to created variable
-  
   begin_op();
   iput(proc->cwd);
   end_op();
@@ -212,13 +210,14 @@ exit(int status) // lab 1 part1a change to int status
 
   acquire(&ptable.lock);
 
-  // Parent might be sleeping in wait(0).
+  // Parent might be sleeping in wait().
   wakeup1(proc->parent);
 
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->parent == proc){
       p->parent = initproc;
+      
       if(p->state == ZOMBIE)
         wakeup1(initproc);
     }
@@ -228,6 +227,22 @@ exit(int status) // lab 1 part1a change to int status
   proc->state = ZOMBIE;
   sched();
   panic("zombie exit");
+}
+
+int
+v2p(int virt, int *physical)
+{
+  pde_t *pde;
+  pte_t *pgtab = 0;
+
+  pde = &proc->pgdir[PDX(virt)];
+  if(*pde & PTE_P)
+  {
+    pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
+  } 
+
+  *physical = (int)&pgtab[PTX(virt)];
+  return (int)&pgtab[PTX(virt)];
 }
 
 // Wait for a child process to exit and return its pid.
@@ -248,6 +263,9 @@ wait(int *status)
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
+
+        *status = p->status;
+
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -257,11 +275,6 @@ wait(int *status)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
-        
-        if(status != 0) {			//lab1 part 1b set status if status is not null
-			*status = p->status;
-		}
-		
         release(&ptable.lock);
         return pid;
       }
@@ -278,24 +291,26 @@ wait(int *status)
   }
 }
 
-int 
-waitpid(int pid, int* status, int options)		//added lab1 part1 
-{													//exactly the same as wait 
-													//but now searches for passed in pid
-  struct proc *p;									//pid flag substituted for child flag
-  int foundPid;
+int
+waitpid(int pid, int *status, int options)
+{
+  struct proc *p;
+  int havekids, returnPid;
 
   acquire(&ptable.lock);
   for(;;){
-    // Scan through table looking for matching pid
-    foundPid = 0;
+    // Scan through table looking for exited children.
+    havekids = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->pid != pid)
         continue;
-      foundPid = 1;
+      havekids = 1;
       if(p->state == ZOMBIE){
-        // match pid
-        pid = p->pid;
+        // Found one.
+
+        *status = p->status;
+
+        returnPid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -304,63 +319,21 @@ waitpid(int pid, int* status, int options)		//added lab1 part1
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
-
-		if(status != 0){			//same as wait function addition
-			*status = p->status;
-		}
-      release(&ptable.lock);
-        
-	  return pid;
-	  }
+        release(&ptable.lock);
+        return returnPid;
+      }
     }
 
-    // If pid not found or killed(ERROR) has occured same as wait function
-    if(!foundPid || proc->killed){
+    // No point waiting if we don't have any children.
+    if(!havekids || proc->killed){
       release(&ptable.lock);
       return -1;
     }
 
-    // Wait for found to exit 
-    sleep(proc, &ptable.lock);  //DOC: wait-sleep	status = p->status
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(proc, &ptable.lock);  //DOC: wait-sleep
   }
 }
-
-int setpriority(int priority)			//added lab1p2
-{												//sets given priorty for given process
-    //struct proc* p;
-  
-    //acquire(&ptable.lock);
-
-    //for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      //if(p->pid == pid)
-     proc->priority = priority; 
-    //}
-
-    //release(&ptable.lock);
-
-    return 0;
-}
-
-int v2p(int* virtual, int* physical)			//lab2 part1
-{
-	pde_t* pde;
-	pte_t* pgtab;
-	pte_t* pgdir;
-	int offset12;
-	
-	pgdir = proc->pgdir;
-	pde = &pgdir[PDX(virtual)];
-	if(*pde & PTE_P){
-		pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
-		offset12 = (uint)virtual & 0xFFF;
-		*physical = (uint)(&pgtab[PTX(virtual)]) << 12 | offset12;
-	}
-	else
-		return -1;
-	return 0;
-}
-
-//PAGEBREAK: 42
 
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
@@ -371,56 +344,46 @@ int v2p(int* virtual, int* physical)			//lab2 part1
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
 void
-scheduler(void) 							//Lab 1 part 2 editing scheduler
+scheduler(void)
 {
   struct proc *p;
-  int highest_Priority;						//lab1 part2 
 
-  for(;;){
-	  
-	//highest_Priority = 64;
+  for(;;)
+  {
     // Enable interrupts on this processor.
     sti();
-	highest_Priority = 64;
+    
+    int priorityChecker = 64;
 
-    // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
-      if(p->priority < highest_Priority)	//when you run out of runnable processes
-      {										
-		  highest_Priority = p->priority;	//save the highest priority (lowest number_ into the struct)
-		  //proc = p;							//run the proccess.
-	  }
-	}
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     {
-      if(p->state != RUNNABLE || p->priority != highest_Priority)
-		continue;
-	
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      
-      //edited for lab 1 part 2 round robin scheduler
-      //if(proc != 0) //created if statement that makes sure proc is not 0
-      //{
-		proc = p;
-		switchuvm(p);
-		p->state = RUNNING;
-		swtch(&cpu->scheduler, p->context);
-		switchkvm();
+        if(p->state != RUNNABLE)
+        continue; 
 
-		// Process is done running for now.
-		// It should have changed its p->state before coming back.
-		proc = 0;
-	  }
-      
+        if (p->priority < priorityChecker)
+        {
+           priorityChecker = p->priority;
+        }
+    }
+
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
+          if(p->state != RUNNABLE || p->priority != priorityChecker) 
+          continue;
+            
+          proc = p;
+          switchuvm(p);
+          p->state = RUNNING;
+          swtch(&cpu->scheduler, p->context);
+          switchkvm();
+
+          proc = 0;
+    }
     release(&ptable.lock);
-
   }
 }
+
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
@@ -560,6 +523,13 @@ kill(int pid)
   return -1;
 }
 
+// Change the priority of the current process.
+void
+setpriority(int priority)
+{
+    proc->priority = priority;
+}
+
 //PAGEBREAK: 36
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
@@ -597,9 +567,8 @@ procdump(void)
   }
 }
 
-
-void 
-hello(void) {
-	
-	cprintf("\nHello!!!!!!! \n");
+void
+hello(void)
+{
+	cprintf("\n\n Hello from the kernel space");
 }

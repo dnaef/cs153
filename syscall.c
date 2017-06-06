@@ -17,7 +17,7 @@
 int
 fetchint(uint addr, int *ip)
 {
-  if(addr >= USERTOP || addr+4 > USERTOP)
+  if(addr >= USERTOP || addr+4 > USERTOP || addr == 0)
     return -1;
   *ip = *(int*)(addr);
   return 0;
@@ -31,10 +31,10 @@ fetchstr(uint addr, char **pp)
 {
   char *s, *ep;
 
-  if(addr >= proc->sz)
+  if(addr >= USERTOP || addr == 0)
     return -1;
   *pp = (char*)addr;
-  ep = (char*)proc->sz;
+  ep = (char*)USERTOP;
   for(s = *pp; s < ep; s++)
     if(*s == 0)
       return s - *pp;
@@ -58,7 +58,7 @@ argptr(int n, char **pp, int size)
 
   if(argint(n, &i) < 0)
     return -1;
-  if(size < 0 || (uint)i >= USERTOP || (uint)i+size > USERTOP)
+  if(size < 0 || (uint)i >= USERTOP || (uint)i+size > USERTOP || (uint)i == 0)
     return -1;
   *pp = (char*)i;
   return 0;
@@ -98,10 +98,10 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_hello(void);			//practice lab
-extern int sys_waitpid(void);		//lab1 part 1c
-extern int sys_setpriority(void);	//lab1 part 2
-extern int sys_v2p(void);			//lab2 part 1
+extern int sys_hello(void);
+extern int sys_waitpid(void);
+extern int sys_setpriority(void);
+extern int sys_v2p(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -125,10 +125,10 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_hello]   sys_hello,			//practice lab
-[SYS_waitpid] sys_waitpid,			//lab 1 part1b
-[SYS_setpriority] sys_setpriority,	//lab 1 part2
-[SYS_v2p]	  sys_v2p,				//lab2
+[SYS_hello]   sys_hello,
+[SYS_waitpid] sys_waitpid,
+[SYS_setpriority] sys_setpriority,
+[SYS_v2p]     sys_v2p,
 };
 
 void

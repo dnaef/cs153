@@ -31,24 +31,24 @@ int
 main(int argc, char *argv[])
 {
     100b:	81 ec 24 02 00 00    	sub    $0x224,%esp
-  int fd, i;
+  int fd, i, exit_status;
   char path[] = "stressfs0";
   char data[512];
 
   printf(1, "stressfs starting\n");
   memset(data, 'a', sizeof(data));
-    1011:	8d 74 24 16          	lea    0x16(%esp),%esi
+    1011:	8d 74 24 12          	lea    0x12(%esp),%esi
 
 int
 main(int argc, char *argv[])
 {
-  int fd, i;
+  int fd, i, exit_status;
   char path[] = "stressfs0";
-    1015:	c7 84 24 16 02 00 00 	movl   $0x65727473,0x216(%esp)
+    1015:	c7 84 24 12 02 00 00 	movl   $0x65727473,0x212(%esp)
     101c:	73 74 72 65 
-    1020:	c7 84 24 1a 02 00 00 	movl   $0x73667373,0x21a(%esp)
+    1020:	c7 84 24 16 02 00 00 	movl   $0x73667373,0x216(%esp)
     1027:	73 73 66 73 
-    102b:	66 c7 84 24 1e 02 00 	movw   $0x30,0x21e(%esp)
+    102b:	66 c7 84 24 1a 02 00 	movw   $0x30,0x21a(%esp)
     1032:	00 30 00 
   char data[512];
 
@@ -95,14 +95,14 @@ main(int argc, char *argv[])
 
   path[8] += i;
   fd = open(path, O_CREATE | O_RDWR);
-    10ad:	8d 84 24 16 02 00 00 	lea    0x216(%esp),%eax
+    10ad:	8d 84 24 12 02 00 00 	lea    0x212(%esp),%eax
     if(fork() > 0)
       break;
 
   printf(1, "write %d\n", i);
 
   path[8] += i;
-    10b4:	00 9c 24 1e 02 00 00 	add    %bl,0x21e(%esp)
+    10b4:	00 9c 24 1a 02 00 00 	add    %bl,0x21a(%esp)
   fd = open(path, O_CREATE | O_RDWR);
     10bb:	31 db                	xor    %ebx,%ebx
     10bd:	c7 44 24 04 02 02 00 	movl   $0x202,0x4(%esp)
@@ -152,7 +152,7 @@ main(int argc, char *argv[])
     1105:	e8 e6 03 00 00       	call   14f0 <printf>
 
   fd = open(path, O_RDONLY);
-    110a:	8d 84 24 16 02 00 00 	lea    0x216(%esp),%eax
+    110a:	8d 84 24 12 02 00 00 	lea    0x212(%esp),%eax
     1111:	c7 44 24 04 00 00 00 	movl   $0x0,0x4(%esp)
     1118:	00 
     1119:	89 04 24             	mov    %eax,(%esp)
@@ -181,16 +181,14 @@ main(int argc, char *argv[])
     1144:	89 3c 24             	mov    %edi,(%esp)
     1147:	e8 74 02 00 00       	call   13c0 <close>
 
-  wait(0);
-    114c:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    1153:	e8 48 02 00 00       	call   13a0 <wait>
+  wait(&exit_status);
+    114c:	8d 84 24 1c 02 00 00 	lea    0x21c(%esp),%eax
+    1153:	89 04 24             	mov    %eax,(%esp)
+    1156:	e8 45 02 00 00       	call   13a0 <wait>
 
   exit(0);
-    1158:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
-    115f:	e8 34 02 00 00       	call   1398 <exit>
-    1164:	90                   	nop
-    1165:	90                   	nop
-    1166:	90                   	nop
+    115b:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+    1162:	e8 31 02 00 00       	call   1398 <exit>
     1167:	90                   	nop
     1168:	90                   	nop
     1169:	90                   	nop
@@ -829,25 +827,25 @@ SYSCALL(uptime)
     1437:	c3                   	ret    
 
 00001438 <hello>:
-SYSCALL(hello) 			// added for Lab0
+SYSCALL(hello)
     1438:	b8 16 00 00 00       	mov    $0x16,%eax
     143d:	cd 40                	int    $0x40
     143f:	c3                   	ret    
 
 00001440 <waitpid>:
-SYSCALL(waitpid) 		// lab1 part 1: c
+SYSCALL(waitpid)
     1440:	b8 17 00 00 00       	mov    $0x17,%eax
     1445:	cd 40                	int    $0x40
     1447:	c3                   	ret    
 
 00001448 <setpriority>:
-SYSCALL(setpriority) 	// lab1 part 2: define syscall
+SYSCALL(setpriority)
     1448:	b8 18 00 00 00       	mov    $0x18,%eax
     144d:	cd 40                	int    $0x40
     144f:	c3                   	ret    
 
 00001450 <v2p>:
-SYSCALL(v2p)			// lab2
+SYSCALL(v2p)
     1450:	b8 19 00 00 00       	mov    $0x19,%eax
     1455:	cd 40                	int    $0x40
     1457:	c3                   	ret    
